@@ -1,0 +1,27 @@
+Settings:
+  # List of items allowed to be dyed.
+  # Available items: NAME_TAG, LEATHER_ARMOR, BED, BUNDLE, SHULKER_BOX
+  dyeables:
+    - NAME_TAG
+    - LEATHER_ARMOR
+    - BED
+    - BUNDLE
+    - SHULKER_BOX
+
+  # Item used to reset a cauldron's color to non (Right-Click)
+  # To disable wash function, set this to 'none':
+  # wash-item: none
+  wash-item: CLAY_BALL
+
+  # Should players allowed to mix colors.
+  allow-mixing: true
+
+  # Sound and particle effects.
+  Effects:
+    enable-sound: true
+    enable-particle: true
+
+Messages:
+  reloaded: "&8[&#0094FFUniversalCauldron&8] &7Plugin reloaded."
+  unknown-usage: "&8[&#0094FFUniversalCauldron&8] &7Unknown usage."
+
