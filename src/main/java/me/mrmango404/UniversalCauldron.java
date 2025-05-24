@@ -1,9 +1,6 @@
 package me.mrmango404;
 
-import me.mrmango404.command.CommandReload;
-import me.mrmango404.listener.Cauldron;
 import me.mrmango404.utils.ConfigHandler;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class UniversalCauldron extends JavaPlugin {
@@ -15,11 +12,9 @@ public class UniversalCauldron extends JavaPlugin {
 	public void onEnable() {
 		instance = this;
 		getCommand("unicauldron").setExecutor(new CommandReload());
-		getServer().getPluginManager().registerEvents(new Cauldron(), this);
+		getServer().getPluginManager().registerEvents(new CauldronListener(), this);
 
 		ConfigHandler.loadConfig();
-
-		System.out.println(Bukkit.getServer().getVersion());
 	}
 
 	@Override
@@ -28,5 +23,14 @@ public class UniversalCauldron extends JavaPlugin {
 
 	public static UniversalCauldron getInstance() {
 		return instance;
+	}
+
+	public static boolean isFolia() {
+		try {
+			Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+			return true;
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
 	}
 }

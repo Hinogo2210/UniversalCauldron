@@ -1,4 +1,4 @@
-package me.mrmango404.listener;
+package me.mrmango404;
 
 import me.mrmango404.cauldron.CauldronCleanHandler;
 import me.mrmango404.cauldron.CauldronDyeHandler;
@@ -11,6 +11,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -18,10 +19,11 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public class Cauldron implements Listener {
+public class CauldronListener implements Listener {
 
 	public enum DyeableItem {
 		NAME_TAG("NAME_TAG"),
@@ -37,7 +39,7 @@ public class Cauldron implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	@EventHandler(ignoreCancelled = true)
 	public void onCauldronInteraction(PlayerInteractEvent event) {
 		Block block;
 		Material materialInHand;
@@ -61,14 +63,20 @@ public class Cauldron implements Listener {
 		// Resets the color of the cauldron by removing the color layer.
 		// Triggered by right-clicking the cauldron using a cleaner item.
 		Material washItem = Material.getMaterial(ConfigHandler.Settings.WASH_ITEM);
+
 		if (materialInHand == washItem) {
 			new CauldronCleanHandler(block, player).handle();
 		} else if (ColorManager.DyeItemColor.fromMaterial(materialInHand).isPresent()) {
 			new CauldronDyeHandler(block, player).handle();
 		} else {
+			ItemStack itemInHand = player.getInventory().getItemInMainHand();
+			if (ItemMatcher.isItemDyeable(itemInHand)) {
+				event.setUseItemInHand(Event.Result.DENY);
+				event.setUseInteractedBlock(Event.Result.DENY);
+				event.setCancelled(true);
+			}
 			new ItemDyeWashHandler(block, player).handle();
 		}
-
 	}
 
 	/**

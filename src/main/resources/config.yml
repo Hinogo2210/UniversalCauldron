@@ -9,7 +9,7 @@ Settings:
     - SHULKER_BOX
 
   # Item used to reset a cauldron's color to non (Right-Click)
-  # To disable wash function, set this to 'none':
+  # To disable caldron cleaning, set this to 'none':
   # wash-item: none
   wash-item: CLAY_BALL
 
@@ -20,6 +20,10 @@ Settings:
   Effects:
     enable-sound: true
     enable-particle: true
+
+  # When the water level decreases in a colored cauldron, the semi-transparent color layer can appear slightly delayed.
+  # Enabling this setting makes the color layer solid, removing the delay effect — but the cauldron water may look less realistic.
+  solid-color: false
 
 Messages:
   reloaded: "&8[&#0094FFUniversalCauldron&8] &7Plugin reloaded."

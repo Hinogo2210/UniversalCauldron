@@ -14,6 +14,7 @@ public class ConfigHandler {
 		public static boolean ALLOW_MIXING;
 		public static boolean ENABLE_SOUND_EFFECTS;
 		public static boolean ENABLE_PARTICLE_EFFECTS;
+		public static boolean SOLID_COLOR;
 	}
 
 	public static class Messages {
@@ -37,6 +38,7 @@ public class ConfigHandler {
 		Settings.ENABLE_SOUND_EFFECTS = config.getBoolean("Settings.Effects.enable-sound");
 		Settings.ENABLE_PARTICLE_EFFECTS = config.getBoolean("Settings.Effects.enable-particle");
 		Settings.WASH_ITEM = config.getString("Settings.wash-item");
+		Settings.SOLID_COLOR = config.getBoolean("Settings.solid-color");
 
 		Messages.RELOADED = config.getString("Messages.reloaded");
 		Messages.UNKNOWN_USAGE = config.getString("Messages.unknown-usage");

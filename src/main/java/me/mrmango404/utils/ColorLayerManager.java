@@ -1,5 +1,6 @@
 package me.mrmango404.utils;
 
+import me.mrmango404.UniversalCauldron;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -70,10 +71,14 @@ public class ColorLayerManager {
 	}
 
 	public static void teleport(Entity entity, Location location) {
-		entity.teleport(location.clone().add(0.5, 0.5, 0.5));
+		Location loc = location.clone().add(0.5, 0.5, 0.5);
+		if (UniversalCauldron.isFolia()) {
+			entity.teleportAsync(loc);
+		} else {
+			entity.teleport(loc);
+		}
 	}
-
-
+	
 	public static void remove(Location location) {
 		getEntity(location).ifPresent(Entity::remove);
 	}
@@ -113,7 +118,7 @@ public class ColorLayerManager {
 	}
 
 	private static void setColor(TextDisplay entity, Color color) {
-		int transparency = 179;
+		int transparency = ConfigHandler.Settings.SOLID_COLOR ? 255 : 179;
 
 		Color newColor = Color.fromARGB(transparency, color.getRed(), color.getGreen(), color.getBlue());
 

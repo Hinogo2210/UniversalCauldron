@@ -7,8 +7,7 @@ public final class SpecialEffect {
 	public enum EffectType {
 		DYE_CAULDRON,
 		CLEAR_CAULDRON,
-		DYE_ITEM,
-		CLEAR_ITEM
+		DYE_N_WASH_ITEM
 	}
 
 	private final World world;
@@ -36,8 +35,8 @@ public final class SpecialEffect {
 			case CLEAR_CAULDRON -> {
 				clearCauldronSound();
 			}
-			case DYE_ITEM -> {
-				dyeItemSound();
+			case DYE_N_WASH_ITEM -> {
+				dyeNWashItemSound();
 			}
 		}
 	}
@@ -57,7 +56,7 @@ public final class SpecialEffect {
 		world.playSound(location, Sound.ENTITY_PLAYER_SPLASH, 1f, 1.5f);
 	}
 
-	private void dyeItemSound() {
+	private void dyeNWashItemSound() {
 		if (!isSoundPlayable()) {
 			return;
 		}

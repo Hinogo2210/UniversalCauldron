@@ -1,9 +1,9 @@
-package me.mrmango404.command;
+package me.mrmango404;
 
-import me.mrmango404.UniversalCauldron;
 import me.mrmango404.utils.ColorManager;
 import me.mrmango404.utils.ConfigHandler;
 import me.mrmango404.utils.PermissionManager;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,22 +18,16 @@ public class CommandReload implements CommandExecutor, TabCompleter {
 
 	@Override
 	public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-		if (!(commandSender instanceof Player player)) {
-			instance.getLogger().warning("This command is only available to the player!");
-			return true;
-		}
-
 		if (strings.length == 1) {
 			if (strings[0].equalsIgnoreCase("reload")) {
-				if (PermissionManager.hasPermission(player, PermissionManager.RELOAD)) {
+				if (PermissionManager.hasPermission(commandSender, PermissionManager.RELOAD)) {
 					ConfigHandler.loadConfig();
-					player.sendMessage(ColorManager.translateColor(ConfigHandler.Messages.RELOADED));
+					sendMsg(commandSender, ColorManager.translateColor(ConfigHandler.Messages.RELOADED));
 					return true;
 				}
 			}
 		}
-
-		player.sendMessage(ColorManager.translateColor(ConfigHandler.Messages.UNKNOWN_USAGE));
+		sendMsg(commandSender, ColorManager.translateColor(ConfigHandler.Messages.UNKNOWN_USAGE));
 		return false;
 	}
 
@@ -57,5 +51,13 @@ public class CommandReload implements CommandExecutor, TabCompleter {
 		}
 
 		return new ArrayList<>();
+	}
+
+	private void sendMsg(CommandSender sender, String msg) {
+		if (sender instanceof Player player) {
+			player.sendMessage(msg);
+		} else {
+			instance.getLogger().info(ChatColor.stripColor(msg));
+		}
 	}
 }

@@ -1,16 +1,19 @@
 package me.mrmango404.cauldron;
 
+import me.mrmango404.UniversalCauldron;
 import me.mrmango404.api.events.ItemDyeEvent;
 import me.mrmango404.api.events.ItemWashEvent;
 import me.mrmango404.utils.*;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.block.CauldronLevelChangeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
@@ -24,10 +27,12 @@ import static org.bukkit.Material.*;
 public class ItemDyeWashHandler extends ICHandler {
 
 	private final ItemStack itemInHand;
+	private final ItemMeta itemMeta;
 
 	public ItemDyeWashHandler(Block block, Player player) {
 		super(block, player);
 		itemInHand = player.getInventory().getItemInMainHand();
+		itemMeta = itemInHand.getItemMeta();
 	}
 
 	@Override
@@ -35,7 +40,6 @@ public class ItemDyeWashHandler extends ICHandler {
 		Optional<TextDisplay> optional = ColorLayerManager.getEntity(blockLoc);
 		if (optional.isPresent()) {
 			TextDisplay entity = optional.get();
-
 			PersistentDataSetter.getColorData(entity).ifPresent(entityColor -> {
 				dyeWithColor(entity, entityColor);
 			});
@@ -56,31 +60,42 @@ public class ItemDyeWashHandler extends ICHandler {
 		}
 
 		if (ItemMatcher.matchLeatherArmor(itemInHand)) {
-			LeatherArmorMeta meta = (LeatherArmorMeta) itemInHand.getItemMeta();
-			meta.setColor(color);
-			itemInHand.setItemMeta(meta);
-			player.getInventory().setItemInMainHand(itemInHand);
-			dyeItem(entity);
+			ItemMeta baseMeta = itemInHand.getItemMeta();
+			if (baseMeta instanceof LeatherArmorMeta meta) {
+				meta.setColor(color);
+				itemInHand.setItemMeta(meta);
+				dyeItem(entity);
+				Bukkit.getScheduler().runTaskLater(UniversalCauldron.getInstance(), player::updateInventory, 1L);
+			}
 		}
 
 		if (ItemMatcher.matchBed(itemInHand)) {
 			String bedColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
 			Material material = Material.valueOf(bedColor + "_BED");
-			itemInHand.setType(material);
+			setItem(player, material);
 			dyeItem(entity);
 		}
 
 		if (ItemMatcher.matchBundle(itemInHand)) {
 			String bundleColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
 			Material material = Material.valueOf(bundleColor + "_BUNDLE");
-			itemInHand.setType(material);
+			setItem(player, material);
 			dyeItem(entity);
 		}
 
 		if (ItemMatcher.matchShulkerBox(itemInHand)) {
 			String shulkerColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
-			Material material = Material.valueOf(shulkerColor + "_SHULKER_BOX");
-			itemInHand.setType(material);
+			ItemStack newItem = new ItemStack(Material.valueOf(shulkerColor + "_SHULKER_BOX"));
+
+			BlockStateMeta oldMeta = (BlockStateMeta) itemInHand.getItemMeta();
+			BlockStateMeta newMeta = (BlockStateMeta) newItem.getItemMeta();
+
+			ShulkerBox oldBox = (ShulkerBox) oldMeta.getBlockState();
+
+			newMeta.setBlockState(oldBox);
+			newItem.setItemMeta(newMeta);
+
+			player.getInventory().setItemInMainHand(newItem);
 			dyeItem(entity);
 		}
 	}
@@ -96,19 +111,47 @@ public class ItemDyeWashHandler extends ICHandler {
 			}
 		}
 
+		if (ItemMatcher.matchLeatherArmor(itemInHand)) {
+			ItemStack newItem = new ItemStack(itemInHand.getType());
+			LeatherArmorMeta newMeta = (LeatherArmorMeta) newItem.getItemMeta();
+			LeatherArmorMeta oldMeta = (LeatherArmorMeta) itemInHand.getItemMeta();
+			if (oldMeta.getColor() != newMeta.getColor()) {
+				oldMeta.setColor(null);
+				newItem.setItemMeta(oldMeta);
+				player.getInventory().setItemInMainHand(newItem);
+				washItem();
+			}
+		}
+
 		if (ItemMatcher.matchBed(itemInHand)) {
-			itemInHand.setType(WHITE_BED);
-			washItem();
+			if (itemInHand.getType() != WHITE_BED) {
+				setItem(player, WHITE_BED);
+				washItem();
+			}
 		}
 
 		if (ItemMatcher.matchBundle(itemInHand)) {
-			itemInHand.setType(BUNDLE);
-			washItem();
+			if (itemInHand.getType() != BUNDLE) {
+				setItem(player, BUNDLE);
+				washItem();
+			}
 		}
 
 		if (ItemMatcher.matchShulkerBox(itemInHand)) {
-			itemInHand.setType(SHULKER_BOX);
-			washItem();
+			if (itemInHand.getType() != SHULKER_BOX) {
+				ItemStack newItem = new ItemStack(SHULKER_BOX);
+
+				BlockStateMeta oldMeta = (BlockStateMeta) itemInHand.getItemMeta();
+				BlockStateMeta newMeta = (BlockStateMeta) newItem.getItemMeta();
+
+				ShulkerBox oldBox = (ShulkerBox) oldMeta.getBlockState();
+
+				newMeta.setBlockState(oldBox);
+				newItem.setItemMeta(newMeta);
+
+				player.getInventory().setItemInMainHand(newItem);
+				washItem();
+			}
 		}
 	}
 
@@ -150,8 +193,14 @@ public class ItemDyeWashHandler extends ICHandler {
 
 			if (!event.isCancelled()) {
 				block.setBlockData(state.getBlockData());
-				new SpecialEffect(location).play(SpecialEffect.EffectType.DYE_ITEM);
+				new SpecialEffect(location).play(SpecialEffect.EffectType.DYE_N_WASH_ITEM);
 			}
 		}
+	}
+
+	private void setItem(Player player, Material material) {
+		ItemStack newItem = new ItemStack(material);
+		newItem.setItemMeta(itemMeta);
+		player.getInventory().setItemInMainHand(newItem);
 	}
 }

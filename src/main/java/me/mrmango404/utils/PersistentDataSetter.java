@@ -29,14 +29,6 @@ public class PersistentDataSetter {
 		return container.has(COLOR);
 	}
 
-//	public static boolean isDyed(TextDisplay entity) {
-//		PersistentDataContainer container = entity.getPersistentDataContainer();
-//		if (hasColorData(entity)) {
-//			return container.get(IS_DYED, PersistentDataType.INTEGER) == 1;
-//		}
-//		return false;
-//	}
-
 	public static Optional<Color> getColorData(TextDisplay entity) {
 		PersistentDataContainer container = entity.getPersistentDataContainer();
 		List<Integer> rgb = container.get(COLOR, PersistentDataType.LIST.integers());
