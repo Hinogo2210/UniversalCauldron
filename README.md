@@ -20,8 +20,9 @@ This is a minecraft plugin that lets you dye cauldrons with RGB colors, and use 
 
 ![dyeItem](https://github.com/user-attachments/assets/025a4f6c-6528-4633-b3fd-619764ee0773)
 
+### Zero setup
 
----
+> No dependencies, no resource packs. Install and enjoy!
 
 ## Commands & Permissions
 
@@ -31,8 +32,7 @@ User Interaction (Dye, Clean…) `universalcauldron.use`
 
 Infinite Dye `universalcauldron.infinite.dye`
 
-Reload, `universalcauldron.reload`:
-- `/unicauldron reload`
+Reload, `universalcauldron.reload` - `/unicauldron reload`
   
 ---
 
