@@ -25,20 +25,6 @@ import java.util.List;
 
 public class CauldronListener implements Listener {
 
-	public enum DyeableItem {
-		NAME_TAG("NAME_TAG"),
-		LEATHER_ARMOR("LEATHER_ARMOR"),
-		BED("BED"),
-		BUNDLE("BUNDLE"),
-		SHULKER_BOX("SHULKER_BOX");
-
-		String name;
-
-		DyeableItem(String name) {
-			this.name = name;
-		}
-	}
-
 	@EventHandler(ignoreCancelled = true)
 	public void onCauldronInteraction(PlayerInteractEvent event) {
 		Block block;
@@ -138,7 +124,7 @@ public class CauldronListener implements Listener {
 	/**
 	 * Updates the position of the color layer to match the cauldron's water level change.
 	 */
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onWaterLevelChange(CauldronLevelChangeEvent event) {
 		Location location = event.getBlock().getLocation();
 		BlockData data = event.getNewState().getBlockData();

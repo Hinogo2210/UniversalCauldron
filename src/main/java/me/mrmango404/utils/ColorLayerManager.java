@@ -78,7 +78,7 @@ public class ColorLayerManager {
 			entity.teleport(loc);
 		}
 	}
-	
+
 	public static void remove(Location location) {
 		getEntity(location).ifPresent(Entity::remove);
 	}
@@ -111,10 +111,6 @@ public class ColorLayerManager {
 		}
 
 		return Optional.ofNullable(first);
-	}
-
-	public static boolean isCauldronDyed(Location location) {
-		return ColorLayerManager.getEntity(location).isPresent();
 	}
 
 	private static void setColor(TextDisplay entity, Color color) {

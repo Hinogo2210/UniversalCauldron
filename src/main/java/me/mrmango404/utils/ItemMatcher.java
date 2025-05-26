@@ -1,24 +1,33 @@
 package me.mrmango404.utils;
 
-import me.mrmango404.CauldronListener;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
 import static org.bukkit.Material.NAME_TAG;
+import static org.bukkit.Material.WOLF_ARMOR;
 
 public class ItemMatcher {
 
+	public enum DyeableItem {
+		NAME_TAG(),
+		LEATHER_ARMOR(),
+		WOLF_ARMOR(),
+		BED(),
+		BUNDLE(),
+		SHULKER_BOX()
+	}
+
 	public static boolean matchNametag(ItemStack itemStack) {
-		if (!isItemDyeable(CauldronListener.DyeableItem.NAME_TAG)) {
+		if (!isItemDyeable(DyeableItem.NAME_TAG)) {
 			return false;
 		}
 		return itemStack.getType() == NAME_TAG;
 	}
 
 	public static boolean matchLeatherArmor(ItemStack itemStack) {
-		if (!isItemDyeable(CauldronListener.DyeableItem.LEATHER_ARMOR)) {
+		if (!isItemDyeable(DyeableItem.LEATHER_ARMOR)) {
 			return false;
 		}
 
@@ -31,32 +40,39 @@ public class ItemMatcher {
 		return LEATHER_ARMORS.contains(itemStack.getType());
 	}
 
+	public static boolean matchWolfArmor(ItemStack itemStack) {
+		if (!isItemDyeable(DyeableItem.WOLF_ARMOR)) {
+			return false;
+		}
+		return itemStack.getType() == WOLF_ARMOR;
+	}
+
 	public static boolean matchBed(ItemStack itemStack) {
-		if (!isItemDyeable(CauldronListener.DyeableItem.BED)) {
+		if (!isItemDyeable(DyeableItem.BED)) {
 			return false;
 		}
 		return itemStack.getType().toString().endsWith("_BED");
 	}
 
 	public static boolean matchBundle(ItemStack itemStack) {
-		if (!isItemDyeable(CauldronListener.DyeableItem.BUNDLE)) {
+		if (!isItemDyeable(DyeableItem.BUNDLE)) {
 			return false;
 		}
 		return itemStack.getType().name().contains("BUNDLE");
 	}
 
 	public static boolean matchShulkerBox(ItemStack itemStack) {
-		if (!isItemDyeable(CauldronListener.DyeableItem.SHULKER_BOX)) {
+		if (!isItemDyeable(DyeableItem.SHULKER_BOX)) {
 			return false;
 		}
 		return itemStack.getType().toString().contains("SHULKER_BOX");
 	}
 
 	public static boolean isItemDyeable(ItemStack itemStack) {
-		return matchNametag(itemStack) || matchLeatherArmor(itemStack) || matchBed(itemStack) || matchBundle(itemStack) || matchShulkerBox(itemStack);
+		return matchNametag(itemStack) || matchLeatherArmor(itemStack) || matchWolfArmor(itemStack) || matchBed(itemStack) || matchBundle(itemStack) || matchShulkerBox(itemStack);
 	}
 
-	private static boolean isItemDyeable(CauldronListener.DyeableItem dyeableItem) {
+	private static boolean isItemDyeable(DyeableItem dyeableItem) {
 		return ConfigHandler.Settings.DYEABLES.stream()
 				.map(String::toUpperCase)
 				.anyMatch(str -> str.equals(dyeableItem.name()));

@@ -60,13 +60,11 @@ public class ItemDyeWashHandler extends ICHandler {
 		}
 
 		if (ItemMatcher.matchLeatherArmor(itemInHand)) {
-			ItemMeta baseMeta = itemInHand.getItemMeta();
-			if (baseMeta instanceof LeatherArmorMeta meta) {
-				meta.setColor(color);
-				itemInHand.setItemMeta(meta);
-				dyeItem(entity);
-				Bukkit.getScheduler().runTaskLater(UniversalCauldron.getInstance(), player::updateInventory, 1L);
-			}
+			dyeLeatherArmor(color, entity);
+		}
+
+		if (ItemMatcher.matchWolfArmor(itemInHand)) {
+			dyeLeatherArmor(color, entity);
 		}
 
 		if (ItemMatcher.matchBed(itemInHand)) {
@@ -112,15 +110,11 @@ public class ItemDyeWashHandler extends ICHandler {
 		}
 
 		if (ItemMatcher.matchLeatherArmor(itemInHand)) {
-			ItemStack newItem = new ItemStack(itemInHand.getType());
-			LeatherArmorMeta newMeta = (LeatherArmorMeta) newItem.getItemMeta();
-			LeatherArmorMeta oldMeta = (LeatherArmorMeta) itemInHand.getItemMeta();
-			if (oldMeta.getColor() != newMeta.getColor()) {
-				oldMeta.setColor(null);
-				newItem.setItemMeta(oldMeta);
-				player.getInventory().setItemInMainHand(newItem);
-				washItem();
-			}
+			washLeatherArmor();
+		}
+
+		if (ItemMatcher.matchWolfArmor(itemInHand)) {
+			washLeatherArmor();
 		}
 
 		if (ItemMatcher.matchBed(itemInHand)) {
@@ -202,5 +196,25 @@ public class ItemDyeWashHandler extends ICHandler {
 		ItemStack newItem = new ItemStack(material);
 		newItem.setItemMeta(itemMeta);
 		player.getInventory().setItemInMainHand(newItem);
+	}
+
+	private void dyeLeatherArmor(Color color, TextDisplay entity) {
+		LeatherArmorMeta meta = (LeatherArmorMeta) itemInHand.getItemMeta();
+		meta.setColor(color);
+		itemInHand.setItemMeta(meta);
+		dyeItem(entity);
+		Bukkit.getScheduler().runTaskLater(UniversalCauldron.getInstance(), player::updateInventory, 1L);
+	}
+
+	private void washLeatherArmor() {
+		ItemStack newItem = new ItemStack(itemInHand.getType());
+		LeatherArmorMeta newMeta = (LeatherArmorMeta) newItem.getItemMeta();
+		LeatherArmorMeta oldMeta = (LeatherArmorMeta) itemInHand.getItemMeta();
+		if (oldMeta.getColor() != newMeta.getColor()) {
+			oldMeta.setColor(null);
+			newItem.setItemMeta(oldMeta);
+			player.getInventory().setItemInMainHand(newItem);
+			washItem();
+		}
 	}
 }
