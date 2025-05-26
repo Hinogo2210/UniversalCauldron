@@ -16,9 +16,15 @@ This is a minecraft plugin that lets you dye cauldrons with RGB colors, and use 
 
 ### Dyeing & Washing Items
 
-> Dye and wash nametags, leather armor, beds, bundles, and shulker boxes. (configurable)
+> Dye and wash various items. (configurable)
 
 ![dyeItem](https://github.com/user-attachments/assets/025a4f6c-6528-4633-b3fd-619764ee0773)
+
+### Dyeables
+
+> Limited 16 Colors - Beds, Bundles, Shulker Boxes  |  RGB Colors - Nametags, Leather Armor, Wolf Armor
+
+![dyeables-v2-342 8%](https://github.com/user-attachments/assets/c703c924-4372-4e69-9b3d-a35aa2dbf787)
 
 ### Zero setup
 
