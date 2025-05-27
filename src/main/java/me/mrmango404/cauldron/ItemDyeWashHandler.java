@@ -203,7 +203,12 @@ public class ItemDyeWashHandler extends ICHandler {
 		meta.setColor(color);
 		itemInHand.setItemMeta(meta);
 		dyeItem(entity);
-		Bukkit.getScheduler().runTaskLater(UniversalCauldron.getInstance(), player::updateInventory, 1L);
+
+		if (UniversalCauldron.isFolia()) {
+			player.getScheduler().runDelayed(UniversalCauldron.getInstance(), task -> player.updateInventory(), null, 1L);
+		} else {
+			Bukkit.getScheduler().runTaskLater(UniversalCauldron.getInstance(), player::updateInventory, 1L);
+		}
 	}
 
 	private void washLeatherArmor() {
