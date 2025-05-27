@@ -1,21 +1,23 @@
 package me.mrmango404.utils;
 
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-import static org.bukkit.Material.NAME_TAG;
-import static org.bukkit.Material.WOLF_ARMOR;
+import static org.bukkit.Material.*;
 
 public class ItemMatcher {
 
 	public enum DyeableItem {
 		NAME_TAG(),
 		LEATHER_ARMOR(),
+		LEATHER_HORSE_ARMOR(),
 		WOLF_ARMOR(),
 		BED(),
 		BUNDLE(),
+		CANDLE(),
 		SHULKER_BOX()
 	}
 
@@ -40,6 +42,13 @@ public class ItemMatcher {
 		return LEATHER_ARMORS.contains(itemStack.getType());
 	}
 
+	public static boolean matchLeatherHorseArmor(ItemStack itemStack) {
+		if (!isItemDyeable(DyeableItem.LEATHER_HORSE_ARMOR)) {
+			return false;
+		}
+		return itemStack.getType() == LEATHER_HORSE_ARMOR;
+	}
+
 	public static boolean matchWolfArmor(ItemStack itemStack) {
 		if (!isItemDyeable(DyeableItem.WOLF_ARMOR)) {
 			return false;
@@ -51,25 +60,33 @@ public class ItemMatcher {
 		if (!isItemDyeable(DyeableItem.BED)) {
 			return false;
 		}
-		return itemStack.getType().toString().endsWith("_BED");
+		return Tag.BEDS.isTagged(itemStack.getType());
 	}
 
 	public static boolean matchBundle(ItemStack itemStack) {
 		if (!isItemDyeable(DyeableItem.BUNDLE)) {
 			return false;
 		}
-		return itemStack.getType().name().contains("BUNDLE");
+		return Tag.ITEMS_BUNDLES.isTagged(itemStack.getType());
+	}
+
+	public static boolean matchCandle(ItemStack itemStack) {
+		if (!isItemDyeable(DyeableItem.CANDLE)) {
+			return false;
+		}
+		return Tag.CANDLES.isTagged(itemStack.getType());
 	}
 
 	public static boolean matchShulkerBox(ItemStack itemStack) {
 		if (!isItemDyeable(DyeableItem.SHULKER_BOX)) {
 			return false;
 		}
-		return itemStack.getType().toString().contains("SHULKER_BOX");
+		return Tag.SHULKER_BOXES.isTagged(itemStack.getType());
 	}
 
 	public static boolean isItemDyeable(ItemStack itemStack) {
-		return matchNametag(itemStack) || matchLeatherArmor(itemStack) || matchWolfArmor(itemStack) || matchBed(itemStack) || matchBundle(itemStack) || matchShulkerBox(itemStack);
+		return matchNametag(itemStack) || matchLeatherArmor(itemStack) || matchLeatherHorseArmor(itemStack)
+				|| matchWolfArmor(itemStack) || matchBed(itemStack) || matchBundle(itemStack) || matchCandle(itemStack) || matchShulkerBox(itemStack);
 	}
 
 	private static boolean isItemDyeable(DyeableItem dyeableItem) {

@@ -63,6 +63,10 @@ public class ItemDyeWashHandler extends ICHandler {
 			dyeLeatherArmor(color, entity);
 		}
 
+		if (ItemMatcher.matchLeatherHorseArmor(itemInHand)) {
+			dyeLeatherArmor(color, entity);
+		}
+
 		if (ItemMatcher.matchWolfArmor(itemInHand)) {
 			dyeLeatherArmor(color, entity);
 		}
@@ -77,6 +81,13 @@ public class ItemDyeWashHandler extends ICHandler {
 		if (ItemMatcher.matchBundle(itemInHand)) {
 			String bundleColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
 			Material material = Material.valueOf(bundleColor + "_BUNDLE");
+			setItem(player, material);
+			dyeItem(entity);
+		}
+
+		if (ItemMatcher.matchCandle(itemInHand)) {
+			String candleColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
+			Material material = Material.valueOf(candleColor + "_CANDLE");
 			setItem(player, material);
 			dyeItem(entity);
 		}
@@ -113,6 +124,10 @@ public class ItemDyeWashHandler extends ICHandler {
 			washLeatherArmor();
 		}
 
+		if (ItemMatcher.matchLeatherHorseArmor(itemInHand)) {
+			washLeatherArmor();
+		}
+
 		if (ItemMatcher.matchWolfArmor(itemInHand)) {
 			washLeatherArmor();
 		}
@@ -127,6 +142,13 @@ public class ItemDyeWashHandler extends ICHandler {
 		if (ItemMatcher.matchBundle(itemInHand)) {
 			if (itemInHand.getType() != BUNDLE) {
 				setItem(player, BUNDLE);
+				washItem();
+			}
+		}
+
+		if (ItemMatcher.matchCandle(itemInHand)) {
+			if (itemInHand.getType() != CANDLE) {
+				setItem(player, CANDLE);
 				washItem();
 			}
 		}

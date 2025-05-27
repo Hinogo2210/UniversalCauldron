@@ -1,12 +1,14 @@
 Settings:
   # List of items allowed to be dyed.
-  # Available items: NAME_TAG, LEATHER_ARMOR, WOLF_ARMOR, BED, BUNDLE, SHULKER_BOX
+  # Available items: NAME_TAG, LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR, BED, BUNDLE, CANDLE, SHULKER_BOX
   dyeables:
     - NAME_TAG
     - LEATHER_ARMOR
+    - LEATHER_HORSE_ARMOR
     - WOLF_ARMOR
     - BED
     - BUNDLE
+    - CANDLE
     - SHULKER_BOX
 
   # Item used to reset a cauldron's color to non (Right-Click)
