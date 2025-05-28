@@ -13,6 +13,10 @@
             <id>papermc</id>
             <url>https://repo.papermc.io/repository/maven-public/</url>
         </repository>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -27,6 +31,11 @@
             <artifactId>bstats-bukkit</artifactId>
             <version>3.0.2</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.tchristofferson</groupId>
+            <artifactId>ConfigUpdater</artifactId>
+            <version>2.2-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

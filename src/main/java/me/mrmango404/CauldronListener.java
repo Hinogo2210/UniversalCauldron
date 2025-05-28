@@ -48,7 +48,7 @@ public class CauldronListener implements Listener {
 
 		// Resets the color of the cauldron by removing the color layer.
 		// Triggered by right-clicking the cauldron using a cleaner item.
-		Material washItem = Material.getMaterial(ConfigHandler.Settings.WASH_ITEM);
+		Material washItem = Material.getMaterial(ConfigHandler.Settings.WASH_ITEM.toUpperCase());
 
 		if (materialInHand == washItem) {
 			new CauldronCleanHandler(block, player).handle();
@@ -56,14 +56,15 @@ public class CauldronListener implements Listener {
 			new CauldronDyeHandler(block, player).handle();
 		} else {
 			ItemStack itemInHand = player.getInventory().getItemInMainHand();
-			if (ItemMatcher.isItemDyeable(itemInHand)) {
+			if (new ItemMatcher(itemInHand).isItemDyeable()) {
 				event.setUseItemInHand(Event.Result.DENY);
 				event.setUseInteractedBlock(Event.Result.DENY);
 				event.setCancelled(true);
+				new ItemDyeWashHandler(block, player).handle();
 			}
-			new ItemDyeWashHandler(block, player).handle();
 		}
 	}
+
 
 	/**
 	 * Despawns the color layer when a cauldron is broken.
@@ -127,19 +128,26 @@ public class CauldronListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	public void onWaterLevelChange(CauldronLevelChangeEvent event) {
 		Location location = event.getBlock().getLocation();
-		BlockData data = event.getNewState().getBlockData();
-		Material material = data.getMaterial();
+		BlockData newData = event.getNewState().getBlockData();
+		BlockData oldData = event.getBlock().getBlockData();
+		Material material = newData.getMaterial();
 
-		if (data instanceof Levelled levelled && material == Material.WATER_CAULDRON) {
-			int waterLevel = levelled.getLevel();
-			ColorLayerManager.getEntity(location).ifPresent(textDisplay -> {
-				PersistentDataSetter.getColorData(textDisplay).ifPresent(entityColor -> {
-					ColorLayerManager.update(location, entityColor, waterLevel);
-				});
-			});
+		if (!(newData instanceof Levelled) || material != Material.WATER_CAULDRON) {
+			ColorLayerManager.remove(location);
 			return;
 		}
 
-		ColorLayerManager.remove(location);
+		int newLevel = ((Levelled) newData).getLevel();
+		int oldLevel = oldData instanceof Levelled ? ((Levelled) oldData).getLevel() : 0;
+
+		ColorLayerManager.getEntity(location).ifPresent(textDisplay -> {
+			PersistentDataSetter.getColorData(textDisplay).ifPresent(entityColor -> {
+				if (newLevel > oldLevel && ConfigHandler.Settings.REMOVE_COLOR_ON_REFILL) {
+					ColorLayerManager.remove(location);
+				} else {
+					ColorLayerManager.update(location, entityColor, newLevel);
+				}
+			});
+		});
 	}
 }

@@ -49,144 +49,285 @@ public class ItemDyeWashHandler extends ICHandler {
 	}
 
 	private void dyeWithColor(TextDisplay entity, Color color) {
-		if (ItemMatcher.matchNametag(itemInHand)) {
-			ItemMeta meta = itemInHand.getItemMeta();
-			String content = meta.getDisplayName();
-			if (!content.isEmpty()) {
-				meta.setDisplayName(ColorManager.translateColor(color, ChatColor.stripColor(content)));
-				itemInHand.setItemMeta(meta);
-				dyeItem(entity);
+		ItemMatcher itemMatcher = new ItemMatcher(itemInHand);
+
+		// Attempt to dye non-stackable items like name tags, armor... etc.
+		itemMatcher.matchNonStackableItem().ifPresent(item -> {
+			switch (item) {
+				case NAME_TAG -> {
+					if (isDyeEventCancelled(entity)) return;
+
+					String content = itemMeta.getDisplayName();
+					if (!content.isEmpty()) {
+						itemMeta.setDisplayName(ColorManager.translateColor(color, ChatColor.stripColor(content)));
+						itemInHand.setItemMeta(itemMeta);
+						consumeWater(blockLoc, player);
+					}
+				}
+				case LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR -> dyeLeatherArmor(color, entity);
+				case BED -> {
+					if (isDyeEventCancelled(entity)) return;
+
+					String bedColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
+					if (isSameColor(itemInHand, bedColor)) return;
+
+					Material material = Material.valueOf(bedColor + "_BED");
+					setItem(player, material);
+					consumeWater(blockLoc, player);
+				}
+				case BUNDLE -> {
+					if (isDyeEventCancelled(entity)) return;
+
+					String bundleColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
+					if (isSameColor(itemInHand, bundleColor)) return;
+
+					Material material = Material.valueOf(bundleColor + "_BUNDLE");
+					setItem(player, material);
+					consumeWater(blockLoc, player);
+				}
+				case SHULKER_BOX -> {
+					if (isDyeEventCancelled(entity)) return;
+
+					String shulkerColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
+					if (isSameColor(itemInHand, shulkerColor)) return;
+
+					ItemStack newItem = new ItemStack(Material.valueOf(shulkerColor + "_SHULKER_BOX"));
+
+					BlockStateMeta oldMeta = (BlockStateMeta) itemInHand.getItemMeta();
+					BlockStateMeta newMeta = (BlockStateMeta) newItem.getItemMeta();
+
+					ShulkerBox oldBox = (ShulkerBox) oldMeta.getBlockState();
+
+					newMeta.setBlockState(oldBox);
+					newItem.setItemMeta(newMeta);
+
+					player.getInventory().setItemInMainHand(newItem);
+					consumeWater(blockLoc, player);
+				}
 			}
-		}
+		});
 
-		if (ItemMatcher.matchLeatherArmor(itemInHand)) {
-			dyeLeatherArmor(color, entity);
-		}
+		// Attempt to dye stackable items like wools, banners... etc.
+		itemMatcher.matchStackableItem().ifPresent(item -> {
+			String itemColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
+			switch (item) {
+				case WOOL -> {
+					if (isDyeEventCancelled(entity)) return;
+					if (isSameColor(itemInHand, itemColor)) return;
 
-		if (ItemMatcher.matchLeatherHorseArmor(itemInHand)) {
-			dyeLeatherArmor(color, entity);
-		}
+					Material material = Material.valueOf(itemColor + "_WOOL");
+					if (addItem(player, material, ItemMatcher.StackableItem.WOOL)) {
+						consumeWater(blockLoc, player);
+					}
+				}
+				case CARPET -> {
+					if (isDyeEventCancelled(entity)) return;
+					if (isSameColor(itemInHand, itemColor)) return;
 
-		if (ItemMatcher.matchWolfArmor(itemInHand)) {
-			dyeLeatherArmor(color, entity);
-		}
+					Material material = Material.valueOf(itemColor + "_CARPET");
+					if (addItem(player, material, ItemMatcher.StackableItem.CARPET)) {
+						consumeWater(blockLoc, player);
+					}
+				}
+				case TERRACOTTA -> {
+					if (isDyeEventCancelled(entity)) return;
+					if (isSameColor(itemInHand, itemColor)) return;
 
-		if (ItemMatcher.matchBed(itemInHand)) {
-			String bedColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
-			Material material = Material.valueOf(bedColor + "_BED");
-			setItem(player, material);
-			dyeItem(entity);
-		}
+					Material material = Material.valueOf(itemColor + "_TERRACOTTA");
+					if (addItem(player, material, ItemMatcher.StackableItem.TERRACOTTA)) {
+						consumeWater(blockLoc, player);
+					}
+				}
+				case CONCRETE -> {
+					if (isDyeEventCancelled(entity)) return;
+					if (isSameColor(itemInHand, itemColor)) return;
 
-		if (ItemMatcher.matchBundle(itemInHand)) {
-			String bundleColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
-			Material material = Material.valueOf(bundleColor + "_BUNDLE");
-			setItem(player, material);
-			dyeItem(entity);
-		}
+					Material material = Material.valueOf(itemColor + "_CONCRETE");
+					if (addItem(player, material, ItemMatcher.StackableItem.CONCRETE)) {
+						consumeWater(blockLoc, player);
+					}
+				}
+				case CONCRETE_POWDER -> {
+					if (isDyeEventCancelled(entity)) return;
+					if (isSameColor(itemInHand, itemColor)) return;
 
-		if (ItemMatcher.matchCandle(itemInHand)) {
-			String candleColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
-			Material material = Material.valueOf(candleColor + "_CANDLE");
-			setItem(player, material);
-			dyeItem(entity);
-		}
+					Material material = Material.valueOf(itemColor + "_CONCRETE_POWDER");
 
-		if (ItemMatcher.matchShulkerBox(itemInHand)) {
-			String shulkerColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
-			ItemStack newItem = new ItemStack(Material.valueOf(shulkerColor + "_SHULKER_BOX"));
+					if (addItem(player, material, ItemMatcher.StackableItem.CONCRETE_POWDER)) {
+						consumeWater(blockLoc, player);
+					}
+				}
+				case GLAZED_TERRACOTTA -> {
+					if (isDyeEventCancelled(entity)) return;
+					if (isSameColor(itemInHand, itemColor)) return;
 
-			BlockStateMeta oldMeta = (BlockStateMeta) itemInHand.getItemMeta();
-			BlockStateMeta newMeta = (BlockStateMeta) newItem.getItemMeta();
+					Material material = Material.valueOf(itemColor + "_GLAZED_TERRACOTTA");
+					if (addItem(player, material, ItemMatcher.StackableItem.GLAZED_TERRACOTTA)) {
+						consumeWater(blockLoc, player);
+					}
+				}
+				case GLASS -> {
+					if (isDyeEventCancelled(entity)) return;
+					if (isSameColor(itemInHand, itemColor)) return;
 
-			ShulkerBox oldBox = (ShulkerBox) oldMeta.getBlockState();
+					Material material = Material.valueOf(itemColor + "_STAINED_GLASS");
+					if (addItem(player, material, ItemMatcher.StackableItem.GLASS)) {
+						consumeWater(blockLoc, player);
+					}
+				}
+				case GLASS_PANE -> {
+					if (isDyeEventCancelled(entity)) return;
+					if (isSameColor(itemInHand, itemColor)) return;
 
-			newMeta.setBlockState(oldBox);
-			newItem.setItemMeta(newMeta);
+					Material material = Material.valueOf(itemColor + "_STAINED_GLASS_PANE");
+					if (addItem(player, material, ItemMatcher.StackableItem.GLASS_PANE)) {
+						consumeWater(blockLoc, player);
+					}
+				}
+				case CANDLE -> {
+					if (isDyeEventCancelled(entity)) return;
+					if (isSameColor(itemInHand, itemColor)) return;
 
-			player.getInventory().setItemInMainHand(newItem);
-			dyeItem(entity);
-		}
+					Material material = Material.valueOf(itemColor + "_CANDLE");
+					if (addItem(player, material, ItemMatcher.StackableItem.CANDLE)) {
+						consumeWater(blockLoc, player);
+					}
+				}
+			}
+		});
 	}
 
 	private void resetToDefault() {
-		if (ItemMatcher.matchNametag(itemInHand)) {
-			ItemMeta meta = itemInHand.getItemMeta();
-			String content = meta.getDisplayName();
-			if (!content.equals("")) {
-				meta.setDisplayName(ChatColor.stripColor(content));
-				itemInHand.setItemMeta(meta);
-				washItem();
+		ItemMatcher itemMatcher = new ItemMatcher(itemInHand);
+		Material material = itemInHand.getType();
+
+		itemMatcher.matchNonStackableItem().ifPresent(item -> {
+			switch (item) {
+				case NAME_TAG -> {
+					if (isWashEventCancelled()) return;
+
+					String content = itemMeta.getDisplayName();
+					if (!content.equals("")) {
+						itemMeta.setDisplayName(ChatColor.stripColor(content));
+						itemInHand.setItemMeta(itemMeta);
+						consumeWater(blockLoc, player);
+					}
+				}
+				case LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR -> washLeatherArmor();
+				case BED -> {
+					if (material != WHITE_BED) {
+						if (isWashEventCancelled()) return;
+						setItem(player, WHITE_BED);
+						consumeWater(blockLoc, player);
+					}
+				}
+				case BUNDLE -> {
+					if (material != BUNDLE) {
+						if (isWashEventCancelled()) return;
+						setItem(player, BUNDLE);
+						consumeWater(blockLoc, player);
+					}
+				}
+				case SHULKER_BOX -> {
+					if (material != SHULKER_BOX) {
+						if (isWashEventCancelled()) return;
+
+						ItemStack newItem = new ItemStack(SHULKER_BOX);
+
+						BlockStateMeta oldMeta = (BlockStateMeta) itemInHand.getItemMeta();
+						BlockStateMeta newMeta = (BlockStateMeta) newItem.getItemMeta();
+
+						ShulkerBox oldBox = (ShulkerBox) oldMeta.getBlockState();
+
+						newMeta.setBlockState(oldBox);
+						newItem.setItemMeta(newMeta);
+
+						player.getInventory().setItemInMainHand(newItem);
+						consumeWater(blockLoc, player);
+					}
+				}
 			}
-		}
+		});
 
-		if (ItemMatcher.matchLeatherArmor(itemInHand)) {
-			washLeatherArmor();
-		}
-
-		if (ItemMatcher.matchLeatherHorseArmor(itemInHand)) {
-			washLeatherArmor();
-		}
-
-		if (ItemMatcher.matchWolfArmor(itemInHand)) {
-			washLeatherArmor();
-		}
-
-		if (ItemMatcher.matchBed(itemInHand)) {
-			if (itemInHand.getType() != WHITE_BED) {
-				setItem(player, WHITE_BED);
-				washItem();
+		itemMatcher.matchStackableItem().ifPresent(item -> {
+			switch (item) {
+				case WOOL -> {
+					if (material != WHITE_WOOL) {
+						if (isWashEventCancelled()) return;
+						setItem(player, WHITE_WOOL);
+						consumeWater(blockLoc, player);
+					}
+				}
+				case CARPET -> {
+					if (material != WHITE_CARPET) {
+						if (isWashEventCancelled()) return;
+						setItem(player, WHITE_CARPET);
+						consumeWater(blockLoc, player);
+					}
+				}
+				case TERRACOTTA -> {
+					if (material != TERRACOTTA) {
+						if (isWashEventCancelled()) return;
+						setItem(player, TERRACOTTA);
+						consumeWater(blockLoc, player);
+					}
+				}
+				case CONCRETE -> {
+					if (material != WHITE_CONCRETE) {
+						if (isWashEventCancelled()) return;
+						setItem(player, WHITE_CONCRETE);
+						consumeWater(blockLoc, player);
+					}
+				}
+				case CONCRETE_POWDER -> {
+					if (material != WHITE_CONCRETE_POWDER) {
+						if (isWashEventCancelled()) return;
+						setItem(player, WHITE_CONCRETE_POWDER);
+						consumeWater(blockLoc, player);
+					}
+				}
+				case GLAZED_TERRACOTTA -> {
+					if (material != WHITE_GLAZED_TERRACOTTA) {
+						if (isWashEventCancelled()) return;
+						setItem(player, WHITE_GLAZED_TERRACOTTA);
+						consumeWater(blockLoc, player);
+					}
+				}
+				case GLASS -> {
+					if (material != GLASS) {
+						if (isWashEventCancelled()) return;
+						setItem(player, GLASS);
+						consumeWater(blockLoc, player);
+					}
+				}
+				case GLASS_PANE -> {
+					if (material != GLASS_PANE) {
+						if (isWashEventCancelled()) return;
+						setItem(player, GLASS_PANE);
+						consumeWater(blockLoc, player);
+					}
+				}
+				case CANDLE -> {
+					if (material != CANDLE) {
+						if (isWashEventCancelled()) return;
+						setItem(player, CANDLE);
+						consumeWater(blockLoc, player);
+					}
+				}
 			}
-		}
-
-		if (ItemMatcher.matchBundle(itemInHand)) {
-			if (itemInHand.getType() != BUNDLE) {
-				setItem(player, BUNDLE);
-				washItem();
-			}
-		}
-
-		if (ItemMatcher.matchCandle(itemInHand)) {
-			if (itemInHand.getType() != CANDLE) {
-				setItem(player, CANDLE);
-				washItem();
-			}
-		}
-
-		if (ItemMatcher.matchShulkerBox(itemInHand)) {
-			if (itemInHand.getType() != SHULKER_BOX) {
-				ItemStack newItem = new ItemStack(SHULKER_BOX);
-
-				BlockStateMeta oldMeta = (BlockStateMeta) itemInHand.getItemMeta();
-				BlockStateMeta newMeta = (BlockStateMeta) newItem.getItemMeta();
-
-				ShulkerBox oldBox = (ShulkerBox) oldMeta.getBlockState();
-
-				newMeta.setBlockState(oldBox);
-				newItem.setItemMeta(newMeta);
-
-				player.getInventory().setItemInMainHand(newItem);
-				washItem();
-			}
-		}
+		});
 	}
 
-	private void dyeItem(TextDisplay entity) {
+	private boolean isDyeEventCancelled(TextDisplay entity) {
 		ItemDyeEvent customEvent = new ItemDyeEvent(block, entity, player);
 		Bukkit.getPluginManager().callEvent(customEvent);
-		if (customEvent.isCancelled()) {
-			return;
-		}
-		consumeWater(blockLoc, player);
+		return customEvent.isCancelled();
 	}
 
-	private void washItem() {
+	private boolean isWashEventCancelled() {
 		ItemWashEvent customEvent = new ItemWashEvent(block, null, player);
 		Bukkit.getPluginManager().callEvent(customEvent);
-		if (customEvent.isCancelled()) {
-			return;
-		}
-		consumeWater(blockLoc, player);
+		return customEvent.isCancelled();
 	}
 
 	private void consumeWater(Location location, Player player) {
@@ -216,16 +357,68 @@ public class ItemDyeWashHandler extends ICHandler {
 
 	private void setItem(Player player, Material material) {
 		ItemStack newItem = new ItemStack(material);
+		newItem.setAmount(itemInHand.getAmount());
 		newItem.setItemMeta(itemMeta);
 		player.getInventory().setItemInMainHand(newItem);
 	}
 
+	private boolean addItem(Player player, Material material, ItemMatcher.StackableItem item) {
+		int amount = ConfigHandler.Settings.STACKABLE_ITEMS.get(item.name());
+		int handAmount = itemInHand.getAmount();
+		int maxStackSize = itemInHand.getMaxStackSize();
+
+		if (handAmount < amount) amount = handAmount;
+
+		ItemStack newItem = new ItemStack(material, amount);
+		newItem.setItemMeta(itemMeta);
+
+		for (ItemStack slotItem : player.getInventory().getContents()) {
+			if (slotItem != null && slotItem.getType() == material) {
+				int combined = slotItem.getAmount() + amount;
+
+				if (combined <= maxStackSize) {
+					slotItem.setAmount(combined);
+					itemInHand.setAmount(handAmount - amount);
+					return true;
+				}
+
+				if (slotItem.getAmount() < maxStackSize) {
+					int available = maxStackSize - slotItem.getAmount();
+					int excess = amount - available;
+
+					slotItem.setAmount(maxStackSize);
+					itemInHand.setAmount(handAmount - amount);
+
+					ItemStack dropped = new ItemStack(material, excess);
+					dropped.setItemMeta(itemMeta);
+					blockLoc.getWorld().dropItem(player.getEyeLocation(), dropped)
+							.setVelocity(player.getLocation().getDirection().multiply(0.2f));
+
+					return true;
+				}
+			}
+		}
+
+		int emptySlot = player.getInventory().firstEmpty();
+		if (emptySlot != -1) {
+			player.getInventory().setItem(emptySlot, newItem);
+			itemInHand.setAmount(handAmount - amount);
+			return true;
+		}
+
+		// No space
+		return false;
+	}
+
+
 	private void dyeLeatherArmor(Color color, TextDisplay entity) {
+		if (isDyeEventCancelled(entity)) return;
 		LeatherArmorMeta meta = (LeatherArmorMeta) itemInHand.getItemMeta();
 		meta.setColor(color);
 		itemInHand.setItemMeta(meta);
-		dyeItem(entity);
+		isDyeEventCancelled(entity);
 		Bukkit.getScheduler().runTaskLater(UniversalCauldron.getInstance(), player::updateInventory, 1L);
+		consumeWater(blockLoc, player);
 	}
 
 	private void washLeatherArmor() {
@@ -233,10 +426,18 @@ public class ItemDyeWashHandler extends ICHandler {
 		LeatherArmorMeta newMeta = (LeatherArmorMeta) newItem.getItemMeta();
 		LeatherArmorMeta oldMeta = (LeatherArmorMeta) itemInHand.getItemMeta();
 		if (oldMeta.getColor() != newMeta.getColor()) {
+			if (isWashEventCancelled()) return;
 			oldMeta.setColor(null);
 			newItem.setItemMeta(oldMeta);
 			player.getInventory().setItemInMainHand(newItem);
-			washItem();
+			consumeWater(blockLoc, player);
 		}
+	}
+
+	/**
+	 * Checks if an item have the same color.
+	 */
+	private boolean isSameColor(ItemStack item, String color) {
+		return item.getType().name().contains(color);
 	}
 }

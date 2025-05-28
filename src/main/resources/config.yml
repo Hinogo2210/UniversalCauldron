@@ -1,15 +1,32 @@
 Settings:
-  # List of items allowed to be dyed.
-  # Available items: NAME_TAG, LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR, BED, BUNDLE, CANDLE, SHULKER_BOX
-  dyeables:
+  # List of non-stackable items allowed to be dyed.
+  # Available items: NAME_TAG, LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR, BED, BUNDLE, SHULKER_BOX
+  non-stackable-items:
     - NAME_TAG
     - LEATHER_ARMOR
     - LEATHER_HORSE_ARMOR
     - WOLF_ARMOR
     - BED
     - BUNDLE
-    - CANDLE
     - SHULKER_BOX
+
+  # List of stackable items allowed to be dyed.
+  # Configure how many items can be dyed per *one* cauldron water level.
+  # Example: "GLASS: 8" = 8 glass per 1 water level (16 glass needs 2 levels)
+  # Available items: WOOL, CARPET, TERRACOTTA, CONCRETE, CONCRETE_POWDER, GLAZED_TERRACOTTA, GLASS, GLASS_PANE, CANDLE
+  stackable-items:
+    WOOL: 8
+    CARPET: 8
+    TERRACOTTA: 8
+    CONCRETE: 8
+    CONCRETE_POWDER: 8
+    GLAZED_TERRACOTTA: 8
+    GLASS: 8
+    GLASS_PANE: 8
+    CANDLE: 8
+
+  # Removes the cauldron's color when it is refilled.
+  remove-color-on-refill: true
 
   # Item used to reset a cauldron's color to non (Right-Click)
   # To disable caldron cleaning, set this to 'none':
