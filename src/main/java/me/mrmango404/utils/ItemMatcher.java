@@ -10,14 +10,13 @@ import java.util.Optional;
 
 public class ItemMatcher {
 
-	private ItemStack itemStack;
+	private final ItemStack itemStack;
 
 	public ItemMatcher(ItemStack itemStack) {
 		this.itemStack = itemStack;
 	}
 
 	public enum NonStackableItem {
-		NAME_TAG(Material.NAME_TAG),
 		LEATHER_ARMOR(null),
 		LEATHER_HORSE_ARMOR(Material.LEATHER_HORSE_ARMOR),
 		WOLF_ARMOR(Material.WOLF_ARMOR),
@@ -48,6 +47,7 @@ public class ItemMatcher {
 	}
 
 	public enum StackableItem {
+		NAME_TAG,
 		WOOL,
 		CARPET,
 		TERRACOTTA,
@@ -61,6 +61,7 @@ public class ItemMatcher {
 		public boolean match(ItemStack item) {
 			Material material = item.getType();
 			return switch (this) {
+				case NAME_TAG -> material.name().equals("NAME_TAG");
 				case WOOL -> Tag.WOOL.isTagged(material);
 				case CARPET -> Tag.WOOL_CARPETS.isTagged(material);
 				case TERRACOTTA -> Tag.TERRACOTTA.isTagged(material);

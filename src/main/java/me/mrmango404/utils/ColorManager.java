@@ -76,7 +76,7 @@ public class ColorManager {
 	}
 
 	/**
-	 * Translates hex code to CharColor.
+	 * Translates hex code to ChatColor.
 	 *
 	 * @return Colorized text.
 	 */

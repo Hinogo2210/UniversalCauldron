@@ -54,16 +54,6 @@ public class ItemDyeWashHandler extends ICHandler {
 		// Attempt to dye non-stackable items like name tags, armor... etc.
 		itemMatcher.matchNonStackableItem().ifPresent(item -> {
 			switch (item) {
-				case NAME_TAG -> {
-					if (isDyeEventCancelled(entity)) return;
-
-					String content = itemMeta.getDisplayName();
-					if (!content.isEmpty()) {
-						itemMeta.setDisplayName(ColorManager.translateColor(color, ChatColor.stripColor(content)));
-						itemInHand.setItemMeta(itemMeta);
-						consumeWater(blockLoc, player);
-					}
-				}
 				case LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR -> dyeLeatherArmor(color, entity);
 				case BED -> {
 					if (isDyeEventCancelled(entity)) return;
@@ -111,6 +101,13 @@ public class ItemDyeWashHandler extends ICHandler {
 		itemMatcher.matchStackableItem().ifPresent(item -> {
 			String itemColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
 			switch (item) {
+				case NAME_TAG -> {
+					if (isDyeEventCancelled(entity)) return;
+
+					if (addItem(player, NAME_TAG, ItemMatcher.StackableItem.NAME_TAG, color)) {
+						consumeWater(blockLoc, player);
+					}
+				}
 				case WOOL -> {
 					if (isDyeEventCancelled(entity)) return;
 					if (isSameColor(itemInHand, itemColor)) return;
@@ -203,16 +200,6 @@ public class ItemDyeWashHandler extends ICHandler {
 
 		itemMatcher.matchNonStackableItem().ifPresent(item -> {
 			switch (item) {
-				case NAME_TAG -> {
-					if (isWashEventCancelled()) return;
-
-					String content = itemMeta.getDisplayName();
-					if (!content.equals("")) {
-						itemMeta.setDisplayName(ChatColor.stripColor(content));
-						itemInHand.setItemMeta(itemMeta);
-						consumeWater(blockLoc, player);
-					}
-				}
 				case LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR -> washLeatherArmor();
 				case BED -> {
 					if (material != WHITE_BED) {
@@ -251,6 +238,16 @@ public class ItemDyeWashHandler extends ICHandler {
 
 		itemMatcher.matchStackableItem().ifPresent(item -> {
 			switch (item) {
+				case NAME_TAG -> {
+					if (isWashEventCancelled()) return;
+
+					String content = itemMeta.getDisplayName();
+					if (!content.isEmpty()) {
+						itemMeta.setDisplayName(ChatColor.stripColor(content));
+						itemInHand.setItemMeta(itemMeta);
+						consumeWater(blockLoc, player);
+					}
+				}
 				case WOOL -> {
 					if (material != WHITE_WOOL) {
 						if (isWashEventCancelled()) return;
@@ -362,7 +359,7 @@ public class ItemDyeWashHandler extends ICHandler {
 		player.getInventory().setItemInMainHand(newItem);
 	}
 
-	private boolean addItem(Player player, Material material, ItemMatcher.StackableItem item) {
+	private boolean addItem(Player player, Material material, ItemMatcher.StackableItem item, Color... color) {
 		int amount = ConfigHandler.Settings.STACKABLE_ITEMS.get(item.name());
 		int handAmount = itemInHand.getAmount();
 		int maxStackSize = itemInHand.getMaxStackSize();
@@ -371,6 +368,14 @@ public class ItemDyeWashHandler extends ICHandler {
 
 		ItemStack newItem = new ItemStack(material, amount);
 		newItem.setItemMeta(itemMeta);
+
+		if (material == NAME_TAG) {
+			String content = itemMeta.getDisplayName();
+			if (!content.isEmpty()) {
+				itemMeta.setDisplayName(ColorManager.translateColor(color[0], ChatColor.stripColor(content)));
+				newItem.setItemMeta(itemMeta);
+			}
+		}
 
 		for (ItemStack slotItem : player.getInventory().getContents()) {
 			if (slotItem != null && slotItem.getType() == material) {
@@ -416,13 +421,13 @@ public class ItemDyeWashHandler extends ICHandler {
 		LeatherArmorMeta meta = (LeatherArmorMeta) itemInHand.getItemMeta();
 		meta.setColor(color);
 		itemInHand.setItemMeta(meta);
-    
+
 		if (UniversalCauldron.isFolia()) {
 			player.getScheduler().runDelayed(UniversalCauldron.getInstance(), task -> player.updateInventory(), null, 1L);
 		} else {
 			Bukkit.getScheduler().runTaskLater(UniversalCauldron.getInstance(), player::updateInventory, 1L);
 		}
-    consumeWater(blockLoc, player);
+		consumeWater(blockLoc, player);
 	}
 
 	private void washLeatherArmor() {

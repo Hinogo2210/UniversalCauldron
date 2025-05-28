@@ -47,8 +47,8 @@ public class ColorLayerManager {
 
 	private static final float xzScale = 3.6f;
 	private static final float yScale = xzScale * 0.9f;
-	private static final float xOffset = -0.046f; // 0.228
-	private static final float zOffset = 0.4f; // 0.45
+	private static final float xOffset = -0.046f;
+	private static final float zOffset = 0.4f;
 
 	public static void spawn(Location location, Color color, int waterLevel) {
 		World world = location.getWorld();

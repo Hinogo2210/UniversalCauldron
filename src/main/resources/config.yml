@@ -1,8 +1,7 @@
 Settings:
   # List of non-stackable items allowed to be dyed.
-  # Available items: NAME_TAG, LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR, BED, BUNDLE, SHULKER_BOX
+  # Available items: LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR, BED, BUNDLE, SHULKER_BOX
   non-stackable-items:
-    - NAME_TAG
     - LEATHER_ARMOR
     - LEATHER_HORSE_ARMOR
     - WOLF_ARMOR
@@ -13,8 +12,9 @@ Settings:
   # List of stackable items allowed to be dyed.
   # Configure how many items can be dyed per *one* cauldron water level.
   # Example: "GLASS: 8" = 8 glass per 1 water level (16 glass needs 2 levels)
-  # Available items: WOOL, CARPET, TERRACOTTA, CONCRETE, CONCRETE_POWDER, GLAZED_TERRACOTTA, GLASS, GLASS_PANE, CANDLE
+  # Available items: NAME_TAG, WOOL, CARPET, TERRACOTTA, CONCRETE, CONCRETE_POWDER, GLAZED_TERRACOTTA, GLASS, GLASS_PANE, CANDLE
   stackable-items:
+    NAME_TAG: 1
     WOOL: 8
     CARPET: 8
     TERRACOTTA: 8

@@ -24,21 +24,9 @@ public class PersistentDataSetter {
 		);
 	}
 
-	public static boolean hasColorData(TextDisplay entity) {
-		PersistentDataContainer container = entity.getPersistentDataContainer();
-		return container.has(COLOR);
-	}
-
 	public static Optional<Color> getColorData(TextDisplay entity) {
 		PersistentDataContainer container = entity.getPersistentDataContainer();
 		List<Integer> rgb = container.get(COLOR, PersistentDataType.LIST.integers());
 		return Optional.of(Color.fromRGB(rgb.get(0), rgb.get(1), rgb.get(2)));
-	}
-
-	public static void removeColorData(TextDisplay entity) {
-		PersistentDataContainer container = entity.getPersistentDataContainer();
-		if (hasColorData(entity)) {
-			container.remove(COLOR);
-		}
 	}
 }
