@@ -22,7 +22,8 @@ This is a minecraft plugin that lets you dye cauldrons with RGB colors, and use 
 
 ### Dyeables
 
-> Limited 16 Colors - Beds, Bundles, Shulker Boxes  |  RGB Colors - Nametags, Leather Armor, Wolf Armor
+> Limited 16 Colors - Beds, Bundles, Candles, Shulker Boxes
+> RGB Colors - Nametags, Leather Armor, Leather Horse Armor, Wolf Armor
 
 ![dyeables-v2-342 8%](https://github.com/user-attachments/assets/c703c924-4372-4e69-9b3d-a35aa2dbf787)
 
