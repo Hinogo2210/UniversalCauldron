@@ -416,9 +416,13 @@ public class ItemDyeWashHandler extends ICHandler {
 		LeatherArmorMeta meta = (LeatherArmorMeta) itemInHand.getItemMeta();
 		meta.setColor(color);
 		itemInHand.setItemMeta(meta);
-		isDyeEventCancelled(entity);
-		Bukkit.getScheduler().runTaskLater(UniversalCauldron.getInstance(), player::updateInventory, 1L);
-		consumeWater(blockLoc, player);
+    
+		if (UniversalCauldron.isFolia()) {
+			player.getScheduler().runDelayed(UniversalCauldron.getInstance(), task -> player.updateInventory(), null, 1L);
+		} else {
+			Bukkit.getScheduler().runTaskLater(UniversalCauldron.getInstance(), player::updateInventory, 1L);
+		}
+    consumeWater(blockLoc, player);
 	}
 
 	private void washLeatherArmor() {

@@ -6,6 +6,7 @@
 
     <groupId>me.mrmango404</groupId>
     <artifactId>UniversalCauldron</artifactId>
+  
     <version>1.2.0</version>
 
     <repositories>
