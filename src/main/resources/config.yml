@@ -45,6 +45,11 @@ Settings:
   # Enabling this setting makes the color layer solid, removing the delay effect — but the cauldron water may look less realistic.
   solid-color: false
 
+  # Disable this plugin in these worlds.
+  disabled-worlds:
+    - worldNo1
+    - worldNo2
+
 Messages:
   reloaded: "&8[&#0094FFUniversalCauldron&8] &7Plugin reloaded."
   unknown-usage: "&8[&#0094FFUniversalCauldron&8] &7Unknown usage."

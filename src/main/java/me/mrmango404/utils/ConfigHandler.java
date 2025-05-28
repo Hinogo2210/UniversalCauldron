@@ -20,6 +20,7 @@ public class ConfigHandler {
 		public static boolean ENABLE_SOUND_EFFECTS;
 		public static boolean ENABLE_PARTICLE_EFFECTS;
 		public static boolean SOLID_COLOR;
+		public static List<String> DISABLED_WORLD;
 	}
 
 	public static class Messages {
@@ -52,6 +53,7 @@ public class ConfigHandler {
 				Settings.STACKABLE_ITEMS.put(item, section.getInt(item));
 			}
 		}
+		Settings.DISABLED_WORLD = config.getStringList("Settings.disabled-worlds");
 
 		Messages.RELOADED = config.getString("Messages.reloaded");
 		Messages.UNKNOWN_USAGE = config.getString("Messages.unknown-usage");

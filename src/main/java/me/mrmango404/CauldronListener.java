@@ -31,20 +31,14 @@ public class CauldronListener implements Listener {
 		Material materialInHand;
 		Player player = event.getPlayer();
 
-		if (!PermissionManager.hasPermission(player, PermissionManager.INTERACTION)) {
-			return;
-		}
-
-		if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND) {
-			return;
-		}
+		if (ConfigHandler.Settings.DISABLED_WORLD.stream().anyMatch(player.getWorld().getName()::equals)) return;
+		if (!PermissionManager.hasPermission(player, PermissionManager.INTERACTION)) return;
+		if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND) return;
 
 		block = event.getClickedBlock();
 		materialInHand = player.getInventory().getItemInMainHand().getType();
 
-		if (block.getType() != Material.WATER_CAULDRON) {
-			return;
-		}
+		if (block.getType() != Material.WATER_CAULDRON) return;
 
 		// Resets the color of the cauldron by removing the color layer.
 		// Triggered by right-clicking the cauldron using a cleaner item.
