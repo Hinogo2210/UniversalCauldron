@@ -1,7 +1,6 @@
 # UniversalCauldron - [Java 1.20.6 - 1.21.5]
 
-This is a minecraft plugin that lets you dye cauldrons with RGB colors, and use them to dye items just like Bedrock
-Edition.
+This is a minecraft plugin that lets you dye cauldrons with RGB colors, and use them to dye items just like Bedrock Edition.
 
 ![background_v2](https://github.com/user-attachments/assets/b6dcec3c-a8d6-45ff-a557-2e1dc9fa6b85)
 
@@ -23,7 +22,8 @@ Edition.
 
 ### Dyeables
 
-> Limited 16 Colors - Beds, Bundles, Candles, Shulker Boxes, Harness
+> Limited 16 Colors - Beds, Bundles, Candles, Shulker Boxes, Wool, Carpet, Terracotta, Conceret, Conceret Powder, Glazed Terracotta, Glass, Glass Pane
+
 > RGB Colors - Nametags, Leather Armor, Leather Horse Armor, Wolf Armor
 
 ![dyeables-v2-342 8%](https://github.com/user-attachments/assets/c703c924-4372-4e69-9b3d-a35aa2dbf787)
@@ -34,8 +34,7 @@ Edition.
 
 ## Commands & Permissions
 
-> Checkout the [config.yml](https://github.com/Hinogo2210/UniversalCauldron/blob/master/src/main/resources/config.yml)
-> for customizations
+> Checkout the [config.yml](https://github.com/Hinogo2210/UniversalCauldron/blob/master/src/main/resources/config.yml) for customizations
 
 User Interaction (Dye, Clean…) `universalcauldron.use`
 
@@ -46,7 +45,6 @@ Reload, `universalcauldron.reload` - `/unicauldron reload`
 ---
 
 ## Contact
-
 Feel free DM my discord: `mromango`<br>
 With any bug report or feature ideas!
 
