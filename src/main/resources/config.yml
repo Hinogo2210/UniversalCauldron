@@ -1,6 +1,6 @@
 Settings:
   # List of non-stackable items allowed to be dyed.
-  # Available items: LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR, BED, BUNDLE, SHULKER_BOX
+  # Available items: LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR, BED, BUNDLE, SHULKER_BOX, HARNESS
   non-stackable-items:
     - LEATHER_ARMOR
     - LEATHER_HORSE_ARMOR
@@ -8,6 +8,7 @@ Settings:
     - BED
     - BUNDLE
     - SHULKER_BOX
+    - HARNESS
 
   # List of stackable items allowed to be dyed.
   # Configure how many items can be dyed per *one* cauldron water level.

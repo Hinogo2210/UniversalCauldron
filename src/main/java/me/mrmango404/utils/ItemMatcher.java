@@ -22,7 +22,8 @@ public class ItemMatcher {
 		WOLF_ARMOR(Material.WOLF_ARMOR),
 		BED(null),
 		BUNDLE(null),
-		SHULKER_BOX(null);
+		SHULKER_BOX(null),
+		HARNESS(null);
 
 		private final Material material;
 
@@ -41,6 +42,7 @@ public class ItemMatcher {
 				case BED -> Tag.BEDS.isTagged(material);
 				case BUNDLE -> material.name().contains("BUNDLE");
 				case SHULKER_BOX -> Tag.SHULKER_BOXES.isTagged(material);
+				case HARNESS -> Tag.ITEMS_HARNESSES.isTagged(material);
 				default -> material == this.material;
 			};
 		}

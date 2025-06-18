@@ -49,39 +49,30 @@ public class ItemDyeWashHandler extends ICHandler {
 	}
 
 	private void dyeWithColor(TextDisplay entity, Color color) {
+		if (isDyeEventCancelled(entity)) return;
+
 		ItemMatcher itemMatcher = new ItemMatcher(itemInHand);
 
 		// Attempt to dye non-stackable items like name tags, armor... etc.
 		itemMatcher.matchNonStackableItem().ifPresent(item -> {
+			String itemColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
 			switch (item) {
 				case LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR -> dyeLeatherArmor(color, entity);
 				case BED -> {
-					if (isDyeEventCancelled(entity)) return;
-
-					String bedColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
-					if (isSameColor(itemInHand, bedColor)) return;
-
-					Material material = Material.valueOf(bedColor + "_BED");
+					if (isSameColor(itemInHand, itemColor)) return;
+					Material material = Material.valueOf(itemColor + "_BED");
 					setItem(player, material);
 					consumeWater(blockLoc, player);
 				}
 				case BUNDLE -> {
-					if (isDyeEventCancelled(entity)) return;
-
-					String bundleColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
-					if (isSameColor(itemInHand, bundleColor)) return;
-
-					Material material = Material.valueOf(bundleColor + "_BUNDLE");
+					if (isSameColor(itemInHand, itemColor)) return;
+					Material material = Material.valueOf(itemColor + "_BUNDLE");
 					setItem(player, material);
 					consumeWater(blockLoc, player);
 				}
 				case SHULKER_BOX -> {
-					if (isDyeEventCancelled(entity)) return;
-
-					String shulkerColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
-					if (isSameColor(itemInHand, shulkerColor)) return;
-
-					ItemStack newItem = new ItemStack(Material.valueOf(shulkerColor + "_SHULKER_BOX"));
+					if (isSameColor(itemInHand, itemColor)) return;
+					ItemStack newItem = new ItemStack(Material.valueOf(itemColor + "_SHULKER_BOX"));
 
 					BlockStateMeta oldMeta = (BlockStateMeta) itemInHand.getItemMeta();
 					BlockStateMeta newMeta = (BlockStateMeta) newItem.getItemMeta();
@@ -94,6 +85,12 @@ public class ItemDyeWashHandler extends ICHandler {
 					player.getInventory().setItemInMainHand(newItem);
 					consumeWater(blockLoc, player);
 				}
+				case HARNESS -> {
+					if (isSameColor(itemInHand, itemColor)) return;
+					Material material = Material.valueOf(itemColor + "_HARNESS");
+					setItem(player, material);
+					consumeWater(blockLoc, player);
+				}
 			}
 		});
 
@@ -102,14 +99,11 @@ public class ItemDyeWashHandler extends ICHandler {
 			String itemColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
 			switch (item) {
 				case NAME_TAG -> {
-					if (isDyeEventCancelled(entity)) return;
-
 					if (addItem(player, NAME_TAG, ItemMatcher.StackableItem.NAME_TAG, color)) {
 						consumeWater(blockLoc, player);
 					}
 				}
 				case WOOL -> {
-					if (isDyeEventCancelled(entity)) return;
 					if (isSameColor(itemInHand, itemColor)) return;
 
 					Material material = Material.valueOf(itemColor + "_WOOL");
@@ -118,7 +112,6 @@ public class ItemDyeWashHandler extends ICHandler {
 					}
 				}
 				case CARPET -> {
-					if (isDyeEventCancelled(entity)) return;
 					if (isSameColor(itemInHand, itemColor)) return;
 
 					Material material = Material.valueOf(itemColor + "_CARPET");
@@ -127,7 +120,6 @@ public class ItemDyeWashHandler extends ICHandler {
 					}
 				}
 				case TERRACOTTA -> {
-					if (isDyeEventCancelled(entity)) return;
 					if (isSameColor(itemInHand, itemColor)) return;
 
 					Material material = Material.valueOf(itemColor + "_TERRACOTTA");
@@ -136,7 +128,6 @@ public class ItemDyeWashHandler extends ICHandler {
 					}
 				}
 				case CONCRETE -> {
-					if (isDyeEventCancelled(entity)) return;
 					if (isSameColor(itemInHand, itemColor)) return;
 
 					Material material = Material.valueOf(itemColor + "_CONCRETE");
@@ -145,7 +136,6 @@ public class ItemDyeWashHandler extends ICHandler {
 					}
 				}
 				case CONCRETE_POWDER -> {
-					if (isDyeEventCancelled(entity)) return;
 					if (isSameColor(itemInHand, itemColor)) return;
 
 					Material material = Material.valueOf(itemColor + "_CONCRETE_POWDER");
@@ -155,7 +145,6 @@ public class ItemDyeWashHandler extends ICHandler {
 					}
 				}
 				case GLAZED_TERRACOTTA -> {
-					if (isDyeEventCancelled(entity)) return;
 					if (isSameColor(itemInHand, itemColor)) return;
 
 					Material material = Material.valueOf(itemColor + "_GLAZED_TERRACOTTA");
@@ -164,7 +153,6 @@ public class ItemDyeWashHandler extends ICHandler {
 					}
 				}
 				case GLASS -> {
-					if (isDyeEventCancelled(entity)) return;
 					if (isSameColor(itemInHand, itemColor)) return;
 
 					Material material = Material.valueOf(itemColor + "_STAINED_GLASS");
@@ -173,7 +161,6 @@ public class ItemDyeWashHandler extends ICHandler {
 					}
 				}
 				case GLASS_PANE -> {
-					if (isDyeEventCancelled(entity)) return;
 					if (isSameColor(itemInHand, itemColor)) return;
 
 					Material material = Material.valueOf(itemColor + "_STAINED_GLASS_PANE");
@@ -182,7 +169,6 @@ public class ItemDyeWashHandler extends ICHandler {
 					}
 				}
 				case CANDLE -> {
-					if (isDyeEventCancelled(entity)) return;
 					if (isSameColor(itemInHand, itemColor)) return;
 
 					Material material = Material.valueOf(itemColor + "_CANDLE");
@@ -195,6 +181,8 @@ public class ItemDyeWashHandler extends ICHandler {
 	}
 
 	private void resetToDefault() {
+		if (isWashEventCancelled()) return;
+
 		ItemMatcher itemMatcher = new ItemMatcher(itemInHand);
 		Material material = itemInHand.getType();
 
@@ -203,22 +191,18 @@ public class ItemDyeWashHandler extends ICHandler {
 				case LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR -> washLeatherArmor();
 				case BED -> {
 					if (material != WHITE_BED) {
-						if (isWashEventCancelled()) return;
 						setItem(player, WHITE_BED);
 						consumeWater(blockLoc, player);
 					}
 				}
 				case BUNDLE -> {
 					if (material != BUNDLE) {
-						if (isWashEventCancelled()) return;
 						setItem(player, BUNDLE);
 						consumeWater(blockLoc, player);
 					}
 				}
 				case SHULKER_BOX -> {
 					if (material != SHULKER_BOX) {
-						if (isWashEventCancelled()) return;
-
 						ItemStack newItem = new ItemStack(SHULKER_BOX);
 
 						BlockStateMeta oldMeta = (BlockStateMeta) itemInHand.getItemMeta();
@@ -233,14 +217,18 @@ public class ItemDyeWashHandler extends ICHandler {
 						consumeWater(blockLoc, player);
 					}
 				}
+				case HARNESS -> {
+					if (material != WHITE_HARNESS) {
+						setItem(player, WHITE_HARNESS);
+						consumeWater(blockLoc, player);
+					}
+				}
 			}
 		});
 
 		itemMatcher.matchStackableItem().ifPresent(item -> {
 			switch (item) {
 				case NAME_TAG -> {
-					if (isWashEventCancelled()) return;
-
 					String content = itemMeta.getDisplayName();
 					if (!content.isEmpty()) {
 						itemMeta.setDisplayName(ChatColor.stripColor(content));
@@ -250,63 +238,54 @@ public class ItemDyeWashHandler extends ICHandler {
 				}
 				case WOOL -> {
 					if (material != WHITE_WOOL) {
-						if (isWashEventCancelled()) return;
 						setItem(player, WHITE_WOOL);
 						consumeWater(blockLoc, player);
 					}
 				}
 				case CARPET -> {
 					if (material != WHITE_CARPET) {
-						if (isWashEventCancelled()) return;
 						setItem(player, WHITE_CARPET);
 						consumeWater(blockLoc, player);
 					}
 				}
 				case TERRACOTTA -> {
 					if (material != TERRACOTTA) {
-						if (isWashEventCancelled()) return;
 						setItem(player, TERRACOTTA);
 						consumeWater(blockLoc, player);
 					}
 				}
 				case CONCRETE -> {
 					if (material != WHITE_CONCRETE) {
-						if (isWashEventCancelled()) return;
 						setItem(player, WHITE_CONCRETE);
 						consumeWater(blockLoc, player);
 					}
 				}
 				case CONCRETE_POWDER -> {
 					if (material != WHITE_CONCRETE_POWDER) {
-						if (isWashEventCancelled()) return;
 						setItem(player, WHITE_CONCRETE_POWDER);
 						consumeWater(blockLoc, player);
 					}
 				}
 				case GLAZED_TERRACOTTA -> {
 					if (material != WHITE_GLAZED_TERRACOTTA) {
-						if (isWashEventCancelled()) return;
 						setItem(player, WHITE_GLAZED_TERRACOTTA);
 						consumeWater(blockLoc, player);
 					}
 				}
 				case GLASS -> {
 					if (material != GLASS) {
-						if (isWashEventCancelled()) return;
 						setItem(player, GLASS);
 						consumeWater(blockLoc, player);
 					}
 				}
 				case GLASS_PANE -> {
 					if (material != GLASS_PANE) {
-						if (isWashEventCancelled()) return;
 						setItem(player, GLASS_PANE);
 						consumeWater(blockLoc, player);
 					}
 				}
 				case CANDLE -> {
 					if (material != CANDLE) {
-						if (isWashEventCancelled()) return;
 						setItem(player, CANDLE);
 						consumeWater(blockLoc, player);
 					}
