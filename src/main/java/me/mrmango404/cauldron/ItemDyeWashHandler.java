@@ -321,13 +321,16 @@ public class ItemDyeWashHandler extends ICHandler {
 				state.setBlockData(data);
 			}
 
-			CauldronLevelChangeEvent event = new CauldronLevelChangeEvent(block, player, CauldronLevelChangeEvent.ChangeReason.UNKNOWN, state);
-			Bukkit.getPluginManager().callEvent(event);
+			if (!PermissionManager.hasPermission(player, PermissionManager.INFINITE_WATER)) {
+				CauldronLevelChangeEvent event = new CauldronLevelChangeEvent(block, player, CauldronLevelChangeEvent.ChangeReason.UNKNOWN, state);
+				Bukkit.getPluginManager().callEvent(event);
 
-			if (!event.isCancelled()) {
-				block.setBlockData(state.getBlockData());
-				new SpecialEffect(location).play(SpecialEffect.EffectType.DYE_N_WASH_ITEM);
+				if (!event.isCancelled()) {
+					block.setBlockData(state.getBlockData());
+				}
 			}
+
+			new SpecialEffect(location).play(SpecialEffect.EffectType.DYE_N_WASH_ITEM);
 		}
 	}
 

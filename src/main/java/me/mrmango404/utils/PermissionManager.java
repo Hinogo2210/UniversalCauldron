@@ -6,7 +6,8 @@ import org.bukkit.entity.Player;
 public enum PermissionManager {
 	INTERACTION("universalcauldron.use"),
 	RELOAD("universalcauldron.reload"),
-	INFINITE_DYE("universalcauldron.infinite.dye");
+	INFINITE_DYE("universalcauldron.infinite.dye"),
+	INFINITE_WATER("universalcauldron.infinite.water");
 
 	private final String permission;
 

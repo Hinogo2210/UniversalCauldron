@@ -1,4 +1,4 @@
-# UniversalCauldron - [Java 1.20.6 - 1.21.5]
+# UniversalCauldron - [Java 1.20.6 - 1.21.6]
 
 This is a minecraft plugin that lets you dye cauldrons with RGB colors, and use them to dye items just like Bedrock
 Edition.
@@ -42,6 +42,8 @@ Edition.
 User Interaction (Dye, Clean…) `universalcauldron.use`
 
 Infinite Dye `universalcauldron.infinite.dye`
+
+Infinite Water `universalcauldron.infinite.water`
 
 Reload, `universalcauldron.reload` - `/unicauldron reload`
   
