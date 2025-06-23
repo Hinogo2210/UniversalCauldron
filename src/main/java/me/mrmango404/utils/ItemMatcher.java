@@ -42,7 +42,7 @@ public class ItemMatcher {
 				case BED -> Tag.BEDS.isTagged(material);
 				case BUNDLE -> material.name().contains("BUNDLE");
 				case SHULKER_BOX -> Tag.SHULKER_BOXES.isTagged(material);
-				case HARNESS -> Tag.ITEMS_HARNESSES.isTagged(material);
+				case HARNESS -> material.name().contains("_HARNESS");
 				default -> material == this.material;
 			};
 		}

@@ -13,6 +13,7 @@ Settings:
   # List of stackable items allowed to be dyed.
   # Configure how many items can be dyed per *one* cauldron water level.
   # Example: "GLASS: 8" = 8 glass per 1 water level (16 glass needs 2 levels)
+  # To disallow player from dyeing an item, simply set the amount to 0.
   # Available items: NAME_TAG, WOOL, CARPET, TERRACOTTA, CONCRETE, CONCRETE_POWDER, GLAZED_TERRACOTTA, GLASS, GLASS_PANE, CANDLE
   stackable-items:
     NAME_TAG: 1
