@@ -10,6 +10,7 @@ import org.bukkit.block.data.Levelled;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.block.CauldronLevelChangeEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
@@ -205,6 +206,7 @@ public class ItemDyeWashHandler extends ICHandler {
 			}
 
 			new SpecialEffect(location).play(SpecialEffect.EffectType.DYE_N_WASH_ITEM);
+			player.swingHand(EquipmentSlot.HAND);
 		}
 	}
 

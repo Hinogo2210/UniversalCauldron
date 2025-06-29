@@ -4,6 +4,7 @@ import me.mrmango404.utils.ColorLayerManager;
 import me.mrmango404.utils.SpecialEffect;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 
 /**
  * Responsible for cauldron cleaning.
@@ -20,6 +21,7 @@ public class CauldronCleanHandler extends ICHandler {
 			if (isCauldronCleanEventCancelled(entity)) return;
 			new SpecialEffect(blockLoc).play(SpecialEffect.EffectType.CLEAR_CAULDRON);
 			ColorLayerManager.remove(blockLoc);
+			player.swingHand(EquipmentSlot.HAND);
 		});
 	}
 }
