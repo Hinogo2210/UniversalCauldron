@@ -94,14 +94,45 @@ public class ColorManager {
 	}
 
 	/**
+	 * Converts Color to Hex code.
+	 *
+	 * @return Colorized text.
+	 */
+	public static String translateColor(Color color) {
+		return String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+	}
+
+	/**
 	 * Converts Color to ChatColor.
 	 *
 	 * @return Colorized text.
 	 */
 	public static String translateColor(Color color, String message) {
-		String hex = String.format("&#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
-		message = hex + message;
+		message = "&" + translateColor(color) + message;
 		return translateColor(message);
+	}
+
+	/**
+	 * Extracts hex code from a string if there's any
+	 *
+	 * @param message String to be searched from
+	 * @return An Optional String with the hex code
+	 */
+	public static Optional<String> hasColor(String message) {
+		String result = null;
+		StringBuilder resultBuilder = new StringBuilder();
+		Pattern pattern = Pattern.compile("§x§[\\da-zA-Z]§[\\da-zA-Z]§[\\da-zA-Z]§[\\da-zA-Z]§[\\da-zA-Z]§[\\da-zA-Z]");
+		Matcher matcher = pattern.matcher(message);
+
+		if (matcher.find()) {
+			String group = matcher.group();
+			for (int i = 3; i <= 14; i += 2) {
+				resultBuilder.append(group.charAt(i));
+			}
+			result = "#" + resultBuilder;
+		}
+
+		return Optional.ofNullable(result);
 	}
 
 	public static Color mix(Color color1, Color color2) {

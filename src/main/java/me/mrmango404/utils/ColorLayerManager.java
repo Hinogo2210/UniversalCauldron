@@ -58,6 +58,7 @@ public class ColorLayerManager {
 			entity.setText("⬛");
 			entity.setTextOpacity((byte) 4);
 			entity.setLineWidth(2);
+			entity.setPersistent(true);
 			setPosition(entity, waterLevel);
 			setColor(entity, color);
 		});
