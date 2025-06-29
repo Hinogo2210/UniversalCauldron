@@ -49,16 +49,26 @@ public class ItemMatcher {
 	}
 
 	public enum StackableItem {
-		NAME_TAG,
-		WOOL,
-		CARPET,
-		TERRACOTTA,
-		CONCRETE,
-		CONCRETE_POWDER,
-		GLAZED_TERRACOTTA,
-		GLASS,
-		GLASS_PANE,
-		CANDLE;
+		NAME_TAG(null),
+		WOOL("_WOOL"),
+		CARPET("_CARPET"),
+		TERRACOTTA("_TERRACOTTA"),
+		CONCRETE("_CONCRETE"),
+		CONCRETE_POWDER("_CONCRETE_POWDER"),
+		GLAZED_TERRACOTTA("_GLAZED_TERRACOTTA"),
+		GLASS("_STAINED_GLASS"),
+		GLASS_PANE("_STAINED_GLASS_PANE"),
+		CANDLE("_CANDLE");
+
+		private final String coloredSuffix; // Used to concatenate colored material ( RED+_WOOL = RED_WOOL )
+
+		StackableItem(String coloredSuffix) {
+			this.coloredSuffix = coloredSuffix;
+		}
+
+		public String getColoredSuffix() {
+			return coloredSuffix;
+		}
 
 		public boolean match(ItemStack item) {
 			Material material = item.getType();

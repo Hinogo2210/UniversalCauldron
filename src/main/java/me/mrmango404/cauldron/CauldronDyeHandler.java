@@ -46,11 +46,7 @@ public class CauldronDyeHandler extends ICHandler {
 					return;
 				}
 
-				CauldronDyeEvent customEvent = new CauldronDyeEvent(block, entity, player);
-				Bukkit.getPluginManager().callEvent(customEvent);
-				if (customEvent.isCancelled()) {
-					return;
-				}
+				if (isCauldronDyeEventCancelled(entity)) return;
 
 				// Before mixing and applying the colors, make sure it’s not too similar.
 				if (ColorManager.areColorsDifferent(materialColor, entityColor)) {

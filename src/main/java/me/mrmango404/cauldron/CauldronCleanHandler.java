@@ -1,9 +1,7 @@
 package me.mrmango404.cauldron;
 
-import me.mrmango404.api.events.CauldronCleanEvent;
 import me.mrmango404.utils.ColorLayerManager;
 import me.mrmango404.utils.SpecialEffect;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -19,15 +17,9 @@ public class CauldronCleanHandler extends ICHandler {
 	@Override
 	public void handle() {
 		ColorLayerManager.getEntity(blockLoc).ifPresent(entity -> {
-			CauldronCleanEvent customEvent = new CauldronCleanEvent(block, entity, player);
-			Bukkit.getPluginManager().callEvent(customEvent);
-
-			if (customEvent.isCancelled()) {
-				return;
-			}
-
-			ColorLayerManager.remove(blockLoc);
+			if (isCauldronCleanEventCancelled(entity)) return;
 			new SpecialEffect(blockLoc).play(SpecialEffect.EffectType.CLEAR_CAULDRON);
+			ColorLayerManager.remove(blockLoc);
 		});
 	}
 }

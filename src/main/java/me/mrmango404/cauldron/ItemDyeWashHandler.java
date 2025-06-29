@@ -1,8 +1,6 @@
 package me.mrmango404.cauldron;
 
 import me.mrmango404.UniversalCauldron;
-import me.mrmango404.api.events.ItemDyeEvent;
-import me.mrmango404.api.events.ItemWashEvent;
 import me.mrmango404.utils.*;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -13,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.entity.TextDisplay;
 import org.bukkit.event.block.CauldronLevelChangeEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.BlockStateMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -49,24 +48,18 @@ public class ItemDyeWashHandler extends ICHandler {
 	}
 
 	private void dyeWithColor(TextDisplay entity, Color color) {
-		if (isDyeEventCancelled(entity)) return;
+		if (isItemDyeEventCancelled(entity)) return;
 
 		ItemMatcher itemMatcher = new ItemMatcher(itemInHand);
 
-		// Attempt to dye non-stackable items like name tags, armor... etc.
+		// Attempt to dye non-stackable items like armor, shulker boxes... etc.
 		itemMatcher.matchNonStackableItem().ifPresent(item -> {
 			String itemColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
 			switch (item) {
 				case LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR -> dyeLeatherArmor(color, entity);
-				case BED -> {
+				case BED, BUNDLE, HARNESS -> {
 					if (isSameColor(itemInHand, itemColor)) return;
-					Material material = Material.valueOf(itemColor + "_BED");
-					setItem(player, material);
-					consumeWater(blockLoc, player);
-				}
-				case BUNDLE -> {
-					if (isSameColor(itemInHand, itemColor)) return;
-					Material material = Material.valueOf(itemColor + "_BUNDLE");
+					Material material = Material.valueOf(itemColor + "_" + item.name().toUpperCase());
 					setItem(player, material);
 					consumeWater(blockLoc, player);
 				}
@@ -85,103 +78,35 @@ public class ItemDyeWashHandler extends ICHandler {
 					player.getInventory().setItemInMainHand(newItem);
 					consumeWater(blockLoc, player);
 				}
-				case HARNESS -> {
-					if (isSameColor(itemInHand, itemColor)) return;
-					Material material = Material.valueOf(itemColor + "_HARNESS");
-					setItem(player, material);
-					consumeWater(blockLoc, player);
-				}
 			}
 		});
 
-		// Attempt to dye stackable items like wools, banners... etc.
+		// Attempt to dye stackable items like name tags, wools, banners... etc.
 		itemMatcher.matchStackableItem().ifPresent(item -> {
-			String itemColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
-			switch (item) {
-				case NAME_TAG -> {
-					if (addItem(player, NAME_TAG, ItemMatcher.StackableItem.NAME_TAG, color)) {
-						consumeWater(blockLoc, player);
-					}
-				}
-				case WOOL -> {
-					if (isSameColor(itemInHand, itemColor)) return;
+			ItemMatcher.StackableItem converted = ItemMatcher.StackableItem.valueOf(item.name().toUpperCase());
+			if (item == ItemMatcher.StackableItem.NAME_TAG) {
+				boolean shouldDye = true;
+				String content = itemMeta.getDisplayName();
+				Optional<String> itemColor = ColorManager.hasColor(content);
 
-					Material material = Material.valueOf(itemColor + "_WOOL");
-					if (addItem(player, material, ItemMatcher.StackableItem.WOOL)) {
-						consumeWater(blockLoc, player);
-					}
+				if (itemColor.isPresent()) {
+					String hex = ColorManager.translateColor(color);
+					String itemHex = itemColor.get();
+					if (hex.equals(itemHex)) shouldDye = false;
 				}
-				case CARPET -> {
-					if (isSameColor(itemInHand, itemColor)) return;
 
-					Material material = Material.valueOf(itemColor + "_CARPET");
-					if (addItem(player, material, ItemMatcher.StackableItem.CARPET)) {
-						consumeWater(blockLoc, player);
-					}
+				if (shouldDye && !content.isEmpty()) {
+					if (addItem(player, ItemMatcher.StackableItem.NAME_TAG, color)) consumeWater(blockLoc, player);
 				}
-				case TERRACOTTA -> {
-					if (isSameColor(itemInHand, itemColor)) return;
-
-					Material material = Material.valueOf(itemColor + "_TERRACOTTA");
-					if (addItem(player, material, ItemMatcher.StackableItem.TERRACOTTA)) {
-						consumeWater(blockLoc, player);
-					}
-				}
-				case CONCRETE -> {
-					if (isSameColor(itemInHand, itemColor)) return;
-
-					Material material = Material.valueOf(itemColor + "_CONCRETE");
-					if (addItem(player, material, ItemMatcher.StackableItem.CONCRETE)) {
-						consumeWater(blockLoc, player);
-					}
-				}
-				case CONCRETE_POWDER -> {
-					if (isSameColor(itemInHand, itemColor)) return;
-
-					Material material = Material.valueOf(itemColor + "_CONCRETE_POWDER");
-
-					if (addItem(player, material, ItemMatcher.StackableItem.CONCRETE_POWDER)) {
-						consumeWater(blockLoc, player);
-					}
-				}
-				case GLAZED_TERRACOTTA -> {
-					if (isSameColor(itemInHand, itemColor)) return;
-
-					Material material = Material.valueOf(itemColor + "_GLAZED_TERRACOTTA");
-					if (addItem(player, material, ItemMatcher.StackableItem.GLAZED_TERRACOTTA)) {
-						consumeWater(blockLoc, player);
-					}
-				}
-				case GLASS -> {
-					if (isSameColor(itemInHand, itemColor)) return;
-
-					Material material = Material.valueOf(itemColor + "_STAINED_GLASS");
-					if (addItem(player, material, ItemMatcher.StackableItem.GLASS)) {
-						consumeWater(blockLoc, player);
-					}
-				}
-				case GLASS_PANE -> {
-					if (isSameColor(itemInHand, itemColor)) return;
-
-					Material material = Material.valueOf(itemColor + "_STAINED_GLASS_PANE");
-					if (addItem(player, material, ItemMatcher.StackableItem.GLASS_PANE)) {
-						consumeWater(blockLoc, player);
-					}
-				}
-				case CANDLE -> {
-					if (isSameColor(itemInHand, itemColor)) return;
-
-					Material material = Material.valueOf(itemColor + "_CANDLE");
-					if (addItem(player, material, ItemMatcher.StackableItem.CANDLE)) {
-						consumeWater(blockLoc, player);
-					}
-				}
+			} else {
+				if (isSameColor(itemInHand, color)) return;
+				if (addItem(player, converted, color)) consumeWater(blockLoc, player);
 			}
 		});
 	}
 
 	private void resetToDefault() {
-		if (isWashEventCancelled()) return;
+		if (isItemWashEventCancelled()) return;
 
 		ItemMatcher itemMatcher = new ItemMatcher(itemInHand);
 		Material material = itemInHand.getType();
@@ -230,80 +155,29 @@ public class ItemDyeWashHandler extends ICHandler {
 			switch (item) {
 				case NAME_TAG -> {
 					String content = itemMeta.getDisplayName();
-					if (!content.isEmpty()) {
+					boolean hasColor = ColorManager.hasColor(content).isPresent();
+					if (!content.isEmpty() && hasColor) {
 						itemMeta.setDisplayName(ChatColor.stripColor(content));
 						itemInHand.setItemMeta(itemMeta);
 						consumeWater(blockLoc, player);
 					}
 				}
-				case WOOL -> {
-					if (material != WHITE_WOOL) {
-						setItem(player, WHITE_WOOL);
+				case WOOL, CARPET, CONCRETE, CONCRETE_POWDER, GLAZED_TERRACOTTA -> {
+					Material whiteMat = Material.valueOf("WHITE_" + item.name().toUpperCase());
+					if (material != whiteMat) {
+						setItem(player, whiteMat);
 						consumeWater(blockLoc, player);
 					}
 				}
-				case CARPET -> {
-					if (material != WHITE_CARPET) {
-						setItem(player, WHITE_CARPET);
-						consumeWater(blockLoc, player);
-					}
-				}
-				case TERRACOTTA -> {
-					if (material != TERRACOTTA) {
-						setItem(player, TERRACOTTA);
-						consumeWater(blockLoc, player);
-					}
-				}
-				case CONCRETE -> {
-					if (material != WHITE_CONCRETE) {
-						setItem(player, WHITE_CONCRETE);
-						consumeWater(blockLoc, player);
-					}
-				}
-				case CONCRETE_POWDER -> {
-					if (material != WHITE_CONCRETE_POWDER) {
-						setItem(player, WHITE_CONCRETE_POWDER);
-						consumeWater(blockLoc, player);
-					}
-				}
-				case GLAZED_TERRACOTTA -> {
-					if (material != WHITE_GLAZED_TERRACOTTA) {
-						setItem(player, WHITE_GLAZED_TERRACOTTA);
-						consumeWater(blockLoc, player);
-					}
-				}
-				case GLASS -> {
-					if (material != GLASS) {
-						setItem(player, GLASS);
-						consumeWater(blockLoc, player);
-					}
-				}
-				case GLASS_PANE -> {
-					if (material != GLASS_PANE) {
-						setItem(player, GLASS_PANE);
-						consumeWater(blockLoc, player);
-					}
-				}
-				case CANDLE -> {
-					if (material != CANDLE) {
-						setItem(player, CANDLE);
+				default -> {
+					Material mat = Material.valueOf(item.name().toUpperCase());
+					if (material != mat) {
+						setItem(player, mat);
 						consumeWater(blockLoc, player);
 					}
 				}
 			}
 		});
-	}
-
-	private boolean isDyeEventCancelled(TextDisplay entity) {
-		ItemDyeEvent customEvent = new ItemDyeEvent(block, entity, player);
-		Bukkit.getPluginManager().callEvent(customEvent);
-		return customEvent.isCancelled();
-	}
-
-	private boolean isWashEventCancelled() {
-		ItemWashEvent customEvent = new ItemWashEvent(block, null, player);
-		Bukkit.getPluginManager().callEvent(customEvent);
-		return customEvent.isCancelled();
 	}
 
 	private void consumeWater(Location location, Player player) {
@@ -341,66 +215,79 @@ public class ItemDyeWashHandler extends ICHandler {
 		player.getInventory().setItemInMainHand(newItem);
 	}
 
-	private boolean addItem(Player player, Material material, ItemMatcher.StackableItem item, Color... color) {
-		int amount = ConfigHandler.Settings.STACKABLE_ITEMS.get(item.name());
-		int handAmount = itemInHand.getAmount();
-		int maxStackSize = itemInHand.getMaxStackSize();
+	/**
+	 * Adds dyed item to player's inventory.
+	 *
+	 * @param type  Item type will be dyeing.
+	 * @param color Color will be applied to the item.
+	 * @return If the item was successfully dyed.
+	 */
+	private boolean addItem(Player player, ItemMatcher.StackableItem type, Color color) {
+		Material material;
+		int amountPerDye = ConfigHandler.Settings.STACKABLE_ITEMS.get(type.name()); // Number of items consumed/dyed per dyed action
+		int undyedAmount = itemInHand.getAmount();
+		PlayerInventory inventory = player.getInventory();
+		ItemStack[] items = inventory.getContents();
+		int addSub = Math.min(undyedAmount, amountPerDye); // Amount to be added/subtracted from the item
 
-		if (handAmount < amount) amount = handAmount;
-
-		ItemStack newItem = new ItemStack(material, amount);
-		newItem.setItemMeta(itemMeta);
-
-		if (material == NAME_TAG) {
-			String content = itemMeta.getDisplayName();
-			if (!content.isEmpty()) {
-				itemMeta.setDisplayName(ColorManager.translateColor(color[0], ChatColor.stripColor(content)));
-				newItem.setItemMeta(itemMeta);
-			}
+		if (type == ItemMatcher.StackableItem.NAME_TAG) {
+			material = NAME_TAG;
+		} else {
+			String itemColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
+			material = Material.valueOf(itemColor + type.getColoredSuffix());
 		}
 
-		for (ItemStack slotItem : player.getInventory().getContents()) {
-			if (slotItem != null && slotItem.getType() == material) {
-				int combined = slotItem.getAmount() + amount;
-
-				if (combined <= maxStackSize) {
-					slotItem.setAmount(combined);
-					itemInHand.setAmount(handAmount - amount);
+		for (ItemStack item : items) {
+			if (item != null && item.getType() == material) {
+				int dyedAmount = item.getAmount();
+				int dyedMaxStack = item.getMaxStackSize();
+				if (dyedAmount + addSub <= dyedMaxStack && material != NAME_TAG) {
+					item.setAmount(dyedAmount + addSub);
+					itemInHand.setAmount(undyedAmount - addSub);
 					return true;
 				}
 
-				if (slotItem.getAmount() < maxStackSize) {
-					int available = maxStackSize - slotItem.getAmount();
-					int excess = amount - available;
-
-					slotItem.setAmount(maxStackSize);
-					itemInHand.setAmount(handAmount - amount);
-
-					ItemStack dropped = new ItemStack(material, excess);
-					dropped.setItemMeta(itemMeta);
-					blockLoc.getWorld().dropItem(player.getEyeLocation(), dropped)
-							.setVelocity(player.getLocation().getDirection().multiply(0.2f));
-
+				if (undyedAmount <= amountPerDye) {
+					int handSlot = inventory.getHeldItemSlot();
+					ItemStack newItem = createDyedItem(color, addSub, material);
+					inventory.setItem(handSlot, newItem);
+					itemInHand.setAmount(undyedAmount - addSub);
 					return true;
 				}
 			}
 		}
 
-		int emptySlot = player.getInventory().firstEmpty();
-		if (emptySlot != -1) {
-			player.getInventory().setItem(emptySlot, newItem);
-			itemInHand.setAmount(handAmount - amount);
+		// When there is an empty slot
+		int firstEmpty = inventory.firstEmpty();
+		if (firstEmpty != -1) {
+			ItemStack newItem = createDyedItem(color, addSub, material);
+			inventory.addItem(newItem);
+			itemInHand.setAmount(undyedAmount - addSub);
 			return true;
 		}
 
-		// No space
+		// Totally full
 		return false;
+	}
+
+	private ItemStack createDyedItem(Color color, int addSub, Material material) {
+		ItemStack newItem = new ItemStack(material);
+
+		ItemMeta meta = itemMeta.clone();
+		if (material == NAME_TAG) {
+			String content = meta.getDisplayName();
+			meta.setDisplayName(ColorManager.translateColor(color, ChatColor.stripColor(content)));
+		}
+		newItem.setAmount(addSub);
+		newItem.setItemMeta(meta);
+
+		return newItem;
 	}
 
 
 	private void dyeLeatherArmor(Color color, TextDisplay entity) {
-		if (isDyeEventCancelled(entity)) return;
-		LeatherArmorMeta meta = (LeatherArmorMeta) itemInHand.getItemMeta();
+		if (isItemDyeEventCancelled(entity)) return;
+		LeatherArmorMeta meta = (LeatherArmorMeta) itemMeta;
 		meta.setColor(color);
 		itemInHand.setItemMeta(meta);
 
@@ -415,9 +302,9 @@ public class ItemDyeWashHandler extends ICHandler {
 	private void washLeatherArmor() {
 		ItemStack newItem = new ItemStack(itemInHand.getType());
 		LeatherArmorMeta newMeta = (LeatherArmorMeta) newItem.getItemMeta();
-		LeatherArmorMeta oldMeta = (LeatherArmorMeta) itemInHand.getItemMeta();
+		LeatherArmorMeta oldMeta = (LeatherArmorMeta) itemMeta.clone();
 		if (oldMeta.getColor() != newMeta.getColor()) {
-			if (isWashEventCancelled()) return;
+			if (isItemWashEventCancelled()) return;
 			oldMeta.setColor(null);
 			newItem.setItemMeta(oldMeta);
 			player.getInventory().setItemInMainHand(newItem);
@@ -426,8 +313,13 @@ public class ItemDyeWashHandler extends ICHandler {
 	}
 
 	/**
-	 * Checks if an item have the same color.
+	 * Checks if an item have the same color with the color.
 	 */
+	private boolean isSameColor(ItemStack item, Color color) {
+		String itemColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
+		return isSameColor(item, itemColor);
+	}
+
 	private boolean isSameColor(ItemStack item, String color) {
 		return item.getType().name().contains(color);
 	}
