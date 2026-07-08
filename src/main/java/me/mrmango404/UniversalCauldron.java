@@ -28,12 +28,12 @@ public class UniversalCauldron extends JavaPlugin {
 		reloadConfig();
 		ConfigHandler.loadConfig();
 
+		if (getClassLoader().getClass().getPackageName().startsWith("org.mockbukkit")) {
+			return;
+		}
+
 		int bStatsID = 25925;
 		new Metrics(this, bStatsID);
-	}
-
-	@Override
-	public void onDisable() {
 	}
 
 	public static UniversalCauldron getInstance() {

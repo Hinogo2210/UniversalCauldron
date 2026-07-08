@@ -88,19 +88,22 @@ public class ItemMatcher {
 		}
 	}
 
-	public Optional<NonStackableItem> matchNonStackableItem() {
+	public Optional<NonStackableItem> searchNonStackableItem() {
+		if (!shouldContinue()) return Optional.empty();
 		return Arrays.stream(NonStackableItem.values())
 				.filter(item -> item.match(itemStack))
 				.findFirst();
 	}
 
-	public Optional<StackableItem> matchStackableItem() {
+	public Optional<StackableItem> searchStackableItem() {
+		if (!shouldContinue()) return Optional.empty();
 		return Arrays.stream(StackableItem.values())
 				.filter(item -> item.match(itemStack))
 				.findFirst();
 	}
 
 	public boolean isItemDyeable() {
+		if (!shouldContinue()) return false;
 		return matchNonStackable() || matchStackable();
 	}
 
@@ -133,5 +136,13 @@ public class ItemMatcher {
 			}
 		}
 		return false;
+	}
+
+	private boolean shouldContinue() {
+		if (itemStack == null) {
+			Logger.error("Null item is used in ItemMacher.");
+			return false;
+		}
+		return true;
 	}
 }

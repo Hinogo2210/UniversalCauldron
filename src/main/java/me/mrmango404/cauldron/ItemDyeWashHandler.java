@@ -54,7 +54,7 @@ public class ItemDyeWashHandler extends ICHandler {
 		ItemMatcher itemMatcher = new ItemMatcher(itemInHand);
 
 		// Attempt to dye non-stackable items like armor, shulker boxes... etc.
-		itemMatcher.matchNonStackableItem().ifPresent(item -> {
+		itemMatcher.searchNonStackableItem().ifPresent(item -> {
 			String itemColor = ColorManager.DyeItemColor.getClosestDye(color).getColorKey();
 			switch (item) {
 				case LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR -> dyeLeatherArmor(color, entity);
@@ -83,7 +83,7 @@ public class ItemDyeWashHandler extends ICHandler {
 		});
 
 		// Attempt to dye stackable items like name tags, wools, banners... etc.
-		itemMatcher.matchStackableItem().ifPresent(item -> {
+		itemMatcher.searchStackableItem().ifPresent(item -> {
 			ItemMatcher.StackableItem converted = ItemMatcher.StackableItem.valueOf(item.name().toUpperCase());
 			if (item == ItemMatcher.StackableItem.NAME_TAG) {
 				boolean shouldDye = true;
@@ -112,7 +112,7 @@ public class ItemDyeWashHandler extends ICHandler {
 		ItemMatcher itemMatcher = new ItemMatcher(itemInHand);
 		Material material = itemInHand.getType();
 
-		itemMatcher.matchNonStackableItem().ifPresent(item -> {
+		itemMatcher.searchNonStackableItem().ifPresent(item -> {
 			switch (item) {
 				case LEATHER_ARMOR, LEATHER_HORSE_ARMOR, WOLF_ARMOR -> washLeatherArmor();
 				case BED -> {
@@ -152,7 +152,7 @@ public class ItemDyeWashHandler extends ICHandler {
 			}
 		});
 
-		itemMatcher.matchStackableItem().ifPresent(item -> {
+		itemMatcher.searchStackableItem().ifPresent(item -> {
 			switch (item) {
 				case NAME_TAG -> {
 					String content = itemMeta.getDisplayName();
